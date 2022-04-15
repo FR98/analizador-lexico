@@ -18,6 +18,17 @@ HEADER = """
 """
 
 # -------------------------------------------------------
+# Functions
+# -------------------------------------------------------
+
+def add_enter():
+    FILE_LINES.append('')
+
+def add_line(line):
+    FILE_LINES.append(line)
+
+
+# -------------------------------------------------------
 # Extracting content from compiler definition file
 # -------------------------------------------------------
 print('Extracting content from compiler definition file...')
@@ -44,57 +55,55 @@ TOKENS = {
 PRODUCTIONS = {}
 
 print('Content extracted successfully!\n')
+
+
 # -------------------------------------------------------
 # Construction of the lexical analyzer file
 # -------------------------------------------------------
 print('Construction of the lexical analyzer file started...')
 
-FILE_LINES.append(HEADER)
+add_line(HEADER)
+add_line("# Lexical Analyzer for Ejemplo Compiler")
+add_enter()
 
-FILE_LINES.append("# Lexical Analyzer for Ejemplo Compiler")
-FILE_LINES.append("")
+add_line("# CHARACTERS")
+for key, value in CHARACTERS.items():
+    add_line(f"{key.upper()} = '{value}'")
+add_enter()
 
-FILE_LINES.append("# CHARACTERS")
-FILE_LINES.append("LETTER = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'")
-FILE_LINES.append("DIGIT = '0123456789'")
-FILE_LINES.append("HEXDIGIT = '0123456789ABCDEF'")
-FILE_LINES.append("")
+add_line("# KEYWORDS")
+add_line(f"KEYWORDS = {list(KEYWORDS.values())}")
+add_enter()
 
-FILE_LINES.append("# KEYWORDS")
-FILE_LINES.append("KEYWORDS = ['if', 'while']")
-FILE_LINES.append("")
+add_line("# TOKENS")
+for key, value in TOKENS.items():
+    add_line(f"{key} = '{value}'")
+add_enter()
+add_enter()
 
-FILE_LINES.append("# TOKENS")
-FILE_LINES.append("id = 'letter {letter|digit} EXCEPT KEYWORDS'")
-FILE_LINES.append("number = 'digit{digit}'")
-FILE_LINES.append("hexnumber = 'hexdigit {hexdigit}'")
-# FILE_LINES.append("hexnumber = 'hexdigit {hexdigit} "(H)"'")
-FILE_LINES.append("")
-FILE_LINES.append("")
+add_line("# PRODUCTIONS")
+add_enter()
+add_enter()
 
-FILE_LINES.append("# PRODUCTIONS")
-FILE_LINES.append("")
-FILE_LINES.append("")
+add_line("# -------------------------------------------------------")
+add_enter()
+add_enter()
 
-FILE_LINES.append("# -------------------------------------------------------")
-FILE_LINES.append("")
-FILE_LINES.append("")
+add_line("try:")
+add_line("    entry_file = open('input/entry.w', 'r')")
+add_line("except IOError:")
+add_line("    print('File not found or path is incorrect')")
+add_line("    exit()")
+add_enter()
 
-FILE_LINES.append("try:")
-FILE_LINES.append("    entry_file = open('input/entry.w', 'r')")
-FILE_LINES.append("except IOError:")
-FILE_LINES.append("    print('File not found or path is incorrect')")
-FILE_LINES.append("    exit()")
-FILE_LINES.append("")
+add_line("entry_file_lines = entry_file.readlines()")
+add_line("entry_file.close()")
+add_enter()
 
-FILE_LINES.append("entry_file_lines = entry_file.readlines()")
-FILE_LINES.append("entry_file.close()")
-FILE_LINES.append("")
-
-FILE_LINES.append("for line in entry_file_lines:")
-FILE_LINES.append("    words = line.split(' ')")
-FILE_LINES.append("    for word in words:")
-FILE_LINES.append("        print(word)")
+add_line("for line in entry_file_lines:")
+add_line("    words = line.split(' ')")
+add_line("    for word in words:")
+add_line("        print(word)")
 
 
 # -------------------------------------------------------
