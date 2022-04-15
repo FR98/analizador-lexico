@@ -17,7 +17,7 @@ while = "while".
 TOKENS
 
 id = letter {letter|digit} EXCEPT KEYWORDS.
-number = digit {digit}.
+number = digit{digit}.
 hexnumber = hexdigit {hexdigit} "(H)".
 
 PRODUCTIONS

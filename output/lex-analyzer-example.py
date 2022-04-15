@@ -18,7 +18,7 @@ KEYWORDS = ['if', 'while']
 # TOKENS
 id = 'letter {letter|digit} EXCEPT KEYWORDS'
 number = 'digit{digit}'
-hexnumber = 'hexdigit {hexdigit}'
+hexnumber = 'hexdigit {hexdigit} "(H)"'
 
 
 # PRODUCTIONS
