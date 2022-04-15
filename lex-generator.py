@@ -4,6 +4,9 @@
 # Francisco Rosal - 18676
 # -------------------------------------------------------
 
+import os
+
+
 FILE_LINES = []
 
 HEADER = """
@@ -17,6 +20,8 @@ HEADER = """
 # -------------------------------------------------------
 # Extracting content from compiler definition file
 # -------------------------------------------------------
+print('Extracting content from compiler definition file...')
+
 COMPILER_NAME = 'Ejemplo'
 
 CHARACTERS = {
@@ -38,9 +43,11 @@ TOKENS = {
 
 PRODUCTIONS = {}
 
+print('Content extracted successfully!\n')
 # -------------------------------------------------------
 # Construction of the lexical analyzer file
 # -------------------------------------------------------
+print('Construction of the lexical analyzer file started...')
 
 FILE_LINES.append(HEADER)
 
@@ -100,8 +107,18 @@ try:
         lex_analyzer.write(line)
         lex_analyzer.write("\n")
 
+    print('Lexical analyzer file generated successfully.\n')
 except:
-    print('There was an error opening and writing on the file.')
+    print('There was an error opening and writing on the file.\n')
     exit()
 finally:
     lex_analyzer.close()
+
+print('Lexical analyzer generator finished.\n')
+
+try:
+    print('Running lexical analyzer...')
+    os.system('python3 output/lex-analyzer.py')
+except:
+    print('There was an error running the lexical analyzer.')
+    exit()
