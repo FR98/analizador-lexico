@@ -6,6 +6,8 @@
 
 # Lexical and Sintax Analyzer for Coco/L Compiler Definition
 
+from afd import AFD
+
 # CHARACTERS
 CHARACTERS = {
     'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -47,10 +49,24 @@ class Token():
 
     @classmethod
     def get_type_of(cls, word):
+
+        characters = {
+            'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            'd': '0123456789',
+        }
+
+        tokens_re = {
+            'id': 'l(l|d)*',
+            'number': 'd(d)*',
+        }
+
         if word in KEYWORDS.values():
             return 'KEYWORD'
         else:
-            return 'ERROR'
+            for token_type, re in tokens_re.items():
+                if AFD(re).accepts(word, characters):
+                    return token_type
+        return 'ERROR'
 
 
 class CompilerDef():
@@ -91,7 +107,8 @@ class CompilerDef():
                 )
 
         for token in self.tokens:
-            print(token)
+            if token.type != 'ERROR':
+                print(token)
 
     def has_lexical_errors(self):
         for token in self.tokens:
