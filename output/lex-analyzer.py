@@ -39,7 +39,7 @@ class Token():
         self.column = column
 
     def __str__(self):
-        return 'Token({}, {}, {}, {})'.format(self.type, self.value, self.line, self.column)
+        return f'Token({self.type}, {self.value}, {self.line+1}, {self.column})'
 
     @classmethod
     def get_type_of(cls, word):

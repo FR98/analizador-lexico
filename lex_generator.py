@@ -93,7 +93,7 @@ class LexGenerator:
         self.add_line("        self.column = column")
         self.add_enter()
         self.add_line("    def __str__(self):")
-        self.add_line("        return 'Token({}, {}, {}, {})'.format(self.type, self.value, self.line, self.column)")
+        self.add_line("        return f'Token({self.type}, {self.value}, {self.line+1}, {self.column})'")
         self.add_enter()
         self.add_line("    @classmethod")
         self.add_line("    def get_type_of(cls, word):")
