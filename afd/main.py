@@ -11,7 +11,6 @@ from afd import AFD
 43 - +
 46 - .
 63 - ?
-69 - E
 97 - a
 98 - b
 99 - c
@@ -21,12 +20,16 @@ from afd import AFD
 103 - g
 104 - h
 124 - |
+126 - ~
 """
 
 re = "then"
 w = "then"
 
-re = "l(l|d)*"
-w = "lldlddd"
+re = "THEN"
+w = "THEN"
+
+# re = "l(l|d)*"
+# w = "lldlddd"
 
 afd = AFD(re, w, draw=False)

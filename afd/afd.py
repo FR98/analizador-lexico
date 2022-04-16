@@ -54,7 +54,7 @@ class AFD:
 
         # Extraigo letras de la expresion
         for hoja in self.tree.leaves:
-            if regex.match(r"[a-z]", self.data[str(hoja.value)].val) and self.data[str(hoja.value)].val not in self.alfabeto:
+            if regex.match(r"[a-zA-Z]", self.data[str(hoja.value)].val) and self.data[str(hoja.value)].val not in self.alfabeto:
                 self.alfabeto.append(self.data[str(hoja.value)].val)
 
         self.alfabeto.sort()
@@ -145,12 +145,12 @@ class AFD:
                 continuar = not all(self.transiciones.values())
 
     def anul(self, node):
-        # Es anul si te puede devolver E
+        # Es anul si te puede devolver Epsilon (~)
         if self.data[str(node.value)].val == "|":
             self.data[str(node.value)].anul = self.data[str(node.left.value)].anul or self.data[str(node.right.value)].anul
         elif self.data[str(node.value)].val == ".":
             self.data[str(node.value)].anul = self.data[str(node.left.value)].anul and self.data[str(node.right.value)].anul
-        elif self.data[str(node.value)].val in ["*", "?", "E"]:
+        elif self.data[str(node.value)].val in ["*", "?", "~"]:
             self.data[str(node.value)].anul = True
         else:
             self.data[str(node.value)].anul = False
@@ -176,7 +176,7 @@ class AFD:
             # Se obtiene la primera posición de su hijo
             self.data[str(node.value)].prima_pos = [item for sublist in [self.data[str(node.left.value)].prima_pos] for item in sublist]
             self.data[str(node.value)].ult_pos = [item for sublist in [self.data[str(node.left.value)].ult_pos] for item in sublist]
-        elif self.data[str(node.value)].val == "E":
+        elif self.data[str(node.value)].val == "~":
             self.data[str(node.value)].prima_pos = []
             self.data[str(node.value)].ult_pos = []
         else:

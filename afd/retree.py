@@ -28,19 +28,6 @@ class Node:
 
         return binary_tree_parent
 
-    def __str__(self):
-        if self.left is None and self.right is None:
-            return """{data}""".format(
-                data = self.data,
-            )
-        else:
-            return """{data}:{left},{right}""".format(
-                data = self.data,
-                left = self.left.data if self.left is not None else "",
-                right = self.right.data if self.right is not None else "",
-            )
-
-
 
 class RETree:
     def __init__(self, initial_regular_expression):
@@ -101,7 +88,7 @@ class RETree:
                             i = j
                             break
                 else:
-                    if partial_expression[i-1] in [")", "*", "+", "?"] or regex.match(r"[a-z]", partial_expression[i-1]):
+                    if partial_expression[i-1] in [")", "*", "+", "?"] or regex.match(r"[a-zA-Z]", partial_expression[i-1]):
                         fin_sub_re = self.get_final_of_expression(partial_expression[i:])
                         fin = i + 1 + fin_sub_re
                         self.get_nodes(partial_expression[i:fin], len(self.temp_roots))
