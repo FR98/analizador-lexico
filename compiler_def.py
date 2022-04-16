@@ -20,6 +20,11 @@ KEYWORDS = {
     'TOKENS': 'TOKENS',
     'PRODUCTIONS': 'PRODUCTIONS',
     'END': 'END',
+    'EXCEPT': 'EXCEPT',
+    '=': '=',
+    '+': '+',
+    '{': '{',
+    '}': '}',
 }
 
 # TOKENS RE
