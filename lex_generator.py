@@ -27,7 +27,7 @@ class LexGenerator:
 
     def add_line(self, line):
         self.FILE_LINES.append(line)
-    
+
     def extract_compiler_def(self):
         # -------------------------------------------------------
         # Extracting content from compiler definition file
@@ -59,17 +59,24 @@ class LexGenerator:
         self.add_enter()
 
         self.add_line("# CHARACTERS")
+        self.add_line("CHARACTERS = {")
         for key, value in self.compiler_def.CHARACTERS.items():
-            self.add_line(f"{key.upper()} = '{value}'")
+            self.add_line(f"\t'{key}': '{value}',")
+        self.add_line("}")
         self.add_enter()
 
         self.add_line("# KEYWORDS")
-        self.add_line(f"KEYWORDS = {list(self.compiler_def.KEYWORDS.values())}")
+        self.add_line("KEYWORDS = {")
+        for key, value in self.compiler_def.KEYWORDS.items():
+            self.add_line(f"\t'{key}': '{value}',")
+        self.add_line("}")
         self.add_enter()
 
-        self.add_line("# TOKENS")
-        for key, value in self.compiler_def.TOKENS.items():
-            self.add_line(f"{key} = '{value}'")
+        self.add_line("# TOKENS RE")
+        self.add_line("TOKENS_RE = {")
+        for key, value in self.compiler_def.TOKENS_RE.items():
+            self.add_line(f"\t'{key}': '{value}',")
+        self.add_line("}")
         self.add_enter()
         self.add_enter()
 
@@ -79,6 +86,8 @@ class LexGenerator:
 
         self.add_line("# -------------------------------------------------------")
         self.add_enter()
+
+        self.add_line("TOKENS = []")
         self.add_enter()
 
         self.add_line("try:")
@@ -92,11 +101,16 @@ class LexGenerator:
         self.add_line("entry_file.close()")
         self.add_enter()
 
-        self.add_line("for line in entry_file_lines:")
-        self.add_line("    words = line.split(' ')")
-        self.add_line("    for word in words:")
-        self.add_line("        print(word)")
-    
+        self.add_line("for line_index, line in enumerate(entry_file_lines):")
+        self.add_line("    if line == '\\n': continue")
+        self.add_line("    words = line.replace('\\n', '').split(' ')")
+        self.add_line("    for word_index, word in enumerate(words):")
+        self.add_line("        TOKENS.append(word)")
+        self.add_enter()
+
+        self.add_line("for token in TOKENS:")
+        self.add_line("    print(token)")
+
     def write_lex_analyzer(self):
         # -------------------------------------------------------
         # Writing the lexical analyzer file

@@ -4,8 +4,31 @@
 # Francisco Rosal - 18676
 # -------------------------------------------------------
 
+# Lexical and Sintax Analyzer for Coco/L Compiler Definition
 
-KEYWORDS = ['COMPILER', 'CHARACTERS', 'KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']
+# CHARACTERS
+CHARACTERS = {
+    'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    'digit': '0123456789',
+}
+
+# KEYWORDS
+KEYWORDS = {
+    'COMPILER': 'COMPILER',
+    'CHARACTERS': 'CHARACTERS',
+    'KEYWORDS': 'KEYWORDS',
+    'TOKENS': 'TOKENS',
+    'PRODUCTIONS': 'PRODUCTIONS',
+    'END': 'END',
+}
+
+# TOKENS RE
+TOKENS_RE = {
+    'id': 'letter {letter|digit} EXCEPT KEYWORDS',
+    'number': 'digit{digit}',
+}
+
+# -------------------------------------------------------
 
 class Token():
     def __init__(self, type, value, line, column):
@@ -19,7 +42,7 @@ class Token():
 
     @classmethod
     def get_type_of(cls, word):
-        if word in ['COMPILER', 'CHARACTERS', 'KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']:
+        if word in KEYWORDS.values():
             return 'KEYWORD'
         else:
             return 'ERROR'
@@ -34,15 +57,20 @@ class CompilerDef():
         self.COMPILER_NAME = ''
         self.CHARACTERS = {}
         self.KEYWORDS = {}
-        self.TOKENS = {}
+        self.TOKENS_RE = {}
         self.PRODUCTIONS = {}
         self.get_tokens()
         self.has_lexical_errors()
-        self.has_sintax_errors()
         self.get_definitions()
+        self.has_sintax_errors()
+
+        if self.lexical_errors or self.sintax_errors:
+            print('\nPlease fix errors before continuing')
+            # exit()
 
 
     def get_tokens(self):
+        # Gramatica Regular
         for line_index, line in enumerate(self.file_lines):
             if line == '\n': continue
             words = line.replace('\n', '').split(' ')
@@ -55,7 +83,7 @@ class CompilerDef():
                         word_index
                     )
                 )
-        
+
         for token in self.tokens:
             print(token)
 
@@ -65,23 +93,13 @@ class CompilerDef():
                 print(f'Lexical error on line {token.line + 1} column {token.column}: {token.value}')
                 self.lexical_errors = True
 
-    def has_sintax_errors(self):
-        pass
-        # for token in self.tokens:
-        #     if token.type == 'ERROR':
-        #         self.sintax_errors = True
-
-    def get_definitions(self):
-
         if self.lexical_errors:
             print('\nLexical errors found on compiler definition file')
 
-        if self.sintax_errors:
-            print('\nSintax errors found on compiler definition file')
+    def get_definitions(self):
+        # Gramaticas libres de contexto
 
-        if self.lexical_errors or self.sintax_errors:
-            print('\nPlease fix errors before continuing')
-            exit()
+        # TODO: Implementar analisis sintantico
 
         self.COMPILER_NAME = 'Ejemplo'
 
@@ -96,10 +114,18 @@ class CompilerDef():
             'while': 'while',
         }
 
-        self.TOKENS = {
+        self.TOKENS_RE = {
             'id': 'letter {letter|digit} EXCEPT KEYWORDS',
             'number': 'digit{digit}',
             'hexnumber': 'hexdigit {hexdigit} "(H)"',
         }
 
         self.PRODUCTIONS = {}
+    
+    def has_sintax_errors(self):
+        # for token in self.tokens:
+        #     if token.type == 'ERROR':
+        #         self.sintax_errors = True
+
+        if self.sintax_errors:
+            print('\nSintax errors found on compiler definition file')
