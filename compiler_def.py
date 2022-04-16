@@ -1,0 +1,105 @@
+# -------------------------------------------------------
+# Diseño de Lenguajes de Programación
+# Compiler Definition
+# Francisco Rosal - 18676
+# -------------------------------------------------------
+
+
+KEYWORDS = ['COMPILER', 'CHARACTERS', 'KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']
+
+class Token():
+    def __init__(self, type, value, line, column):
+        self.type = type
+        self.value = value
+        self.line = line
+        self.column = column
+
+    def __str__(self):
+        return 'Token({}, {}, {}, {})'.format(self.type, self.value, self.line, self.column)
+
+    @classmethod
+    def get_type_of(cls, word):
+        if word in ['COMPILER', 'CHARACTERS', 'KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']:
+            return 'KEYWORD'
+        else:
+            return 'ERROR'
+
+
+class CompilerDef():
+    def __init__(self, file_lines):
+        self.file_lines = file_lines
+        self.lexical_errors = False
+        self.sintax_errors = False
+        self.tokens = []
+        self.COMPILER_NAME = ''
+        self.CHARACTERS = {}
+        self.KEYWORDS = {}
+        self.TOKENS = {}
+        self.PRODUCTIONS = {}
+        self.get_tokens()
+        self.has_lexical_errors()
+        self.has_sintax_errors()
+        self.get_definitions()
+
+
+    def get_tokens(self):
+        for line_index, line in enumerate(self.file_lines):
+            if line == '\n': continue
+            words = line.replace('\n', '').split(' ')
+            for word_index, word in enumerate(words):
+                self.tokens.append(
+                    Token(
+                        Token.get_type_of(word),
+                        word,
+                        line_index,
+                        word_index
+                    )
+                )
+        
+        for token in self.tokens:
+            print(token)
+
+    def has_lexical_errors(self):
+        for token in self.tokens:
+            if token.type == 'ERROR':
+                print(f'Lexical error on line {token.line + 1} column {token.column}: {token.value}')
+                self.lexical_errors = True
+
+    def has_sintax_errors(self):
+        pass
+        # for token in self.tokens:
+        #     if token.type == 'ERROR':
+        #         self.sintax_errors = True
+
+    def get_definitions(self):
+
+        if self.lexical_errors:
+            print('\nLexical errors found on compiler definition file')
+
+        if self.sintax_errors:
+            print('\nSintax errors found on compiler definition file')
+
+        if self.lexical_errors or self.sintax_errors:
+            print('\nPlease fix errors before continuing')
+            exit()
+
+        self.COMPILER_NAME = 'Ejemplo'
+
+        self.CHARACTERS = {
+            'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            'digit': '0123456789',
+            'hexdigit': '0123456789ABCDEF',
+        }
+
+        self.KEYWORDS = {
+            'if': 'if',
+            'while': 'while',
+        }
+
+        self.TOKENS = {
+            'id': 'letter {letter|digit} EXCEPT KEYWORDS',
+            'number': 'digit{digit}',
+            'hexnumber': 'hexdigit {hexdigit} "(H)"',
+        }
+
+        self.PRODUCTIONS = {}
