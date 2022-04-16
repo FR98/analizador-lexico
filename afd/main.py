@@ -29,7 +29,7 @@ w = "then"
 re = "THEN"
 w = "THEN"
 
-# re = "l(l|d)*"
-# w = "lldlddd"
+re = "l(l|d)*"
+w = "var1"
 
 afd = AFD(re, w, draw=False)

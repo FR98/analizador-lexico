@@ -71,7 +71,7 @@ class CompilerDef():
 
         if self.lexical_errors or self.sintax_errors:
             print('\nPlease fix errors before continuing')
-            # exit()
+            exit()
 
 
     def get_tokens(self):
@@ -80,6 +80,7 @@ class CompilerDef():
             if line == '\n': continue
             words = line.replace('\n', '').split(' ')
             for word_index, word in enumerate(words):
+                word = word.replace('.', '')
                 self.tokens.append(
                     Token(
                         Token.get_type_of(word),
