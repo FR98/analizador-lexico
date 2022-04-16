@@ -68,12 +68,7 @@ for line_index, line in enumerate(entry_file_lines):
     words = line.replace('\n', '').split(' ')
     for word_index, word in enumerate(words):
         TOKENS.append(
-            Token(
-                Token.get_type_of(word),
-                word,
-                line_index,
-                word_index
-            )
+            Token(Token.get_type_of(word), word, line_index, word_index)
         )
 
 for token in TOKENS:

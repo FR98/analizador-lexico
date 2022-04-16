@@ -85,6 +85,28 @@ class LexGenerator:
         self.add_enter()
 
         self.add_line("# -------------------------------------------------------")
+        self.add_line("class Token():")
+        self.add_line("    def __init__(self, type, value, line, column):")
+        self.add_line("        self.type = type")
+        self.add_line("        self.value = value")
+        self.add_line("        self.line = line")
+        self.add_line("        self.column = column")
+        self.add_enter()
+        self.add_line("    def __str__(self):")
+        self.add_line("        return 'Token({}, {}, {}, {})'.format(self.type, self.value, self.line, self.column)")
+        self.add_enter()
+        self.add_line("    @classmethod")
+        self.add_line("    def get_type_of(cls, word):")
+        self.add_line("        if word in KEYWORDS.values():")
+        self.add_line("            return 'KEYWORD'")
+        self.add_line("        else:")
+        self.add_line("            return 'ERROR'")
+        self.add_enter()
+        self.add_enter()
+
+
+        self.add_line("# -------------------------------------------------------")
+        self.add_enter()
         self.add_enter()
 
         self.add_line("TOKENS = []")
@@ -105,11 +127,25 @@ class LexGenerator:
         self.add_line("    if line == '\\n': continue")
         self.add_line("    words = line.replace('\\n', '').split(' ')")
         self.add_line("    for word_index, word in enumerate(words):")
-        self.add_line("        TOKENS.append(word)")
+        self.add_line("        TOKENS.append(")
+        self.add_line("            Token(Token.get_type_of(word), word, line_index, word_index)")
+        self.add_line("        )")
         self.add_enter()
 
         self.add_line("for token in TOKENS:")
         self.add_line("    print(token)")
+        self.add_enter()
+
+        self.add_line("lexical_errors = False")
+        self.add_line("for token in TOKENS:")
+        self.add_line("    if token.type == 'ERROR':")
+        self.add_line("        print(f'Lexical error on line {token.line + 1} column {token.column}: {token.value}')")
+        self.add_line("        lexical_errors = True")
+        self.add_enter()
+
+        self.add_line("if lexical_errors:")
+        self.add_line("    print('\\nLexical errors found on compiler definition file')")
+
 
     def write_lex_analyzer(self):
         # -------------------------------------------------------
