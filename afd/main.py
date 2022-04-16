@@ -32,4 +32,14 @@ w = "THEN"
 re = "l(l|d)*"
 w = "var1"
 
-afd = AFD(re, w, draw=False)
+afd = AFD(re, draw=False)
+
+characters = {
+    'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    'd': '0123456789',
+}
+
+if afd.accepts(w, characters):
+    print("Si pertenece")
+else:
+    print("No pertenece")

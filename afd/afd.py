@@ -19,7 +19,7 @@ class Estado:
 
 
 class AFD:
-    def __init__(self, re, w=None, draw=False):
+    def __init__(self, re, draw=False):
         self.data = {}
         self.tree = None
         self.alfabeto = []
@@ -30,12 +30,6 @@ class AFD:
 
         if draw:
             self.draw()
-
-        if w is not None:
-            if self.simulacion(w):
-                print("Si pertenece")
-            else:
-                print("No pertenece")
 
     def construct_tree(self, re):
         re = "(" + re + ")#"
@@ -64,22 +58,36 @@ class AFD:
             self.prima_y_ult(node)
             self.next_pos(node)
 
-    def simulacion(self, cadena):
-        for i in cadena:
-            if i not in self.alfabeto: return False
+    def accepts(self, word, characters):
+        return self.simulacion(word, characters)
+
+    def simulacion(self, word, characters):
+        for char in word:
+            belongs_to = False
+            for key in self.alfabeto:
+                if char in characters[key]:
+                    belongs_to = True
+                    break
+            if not belongs_to:
+                return False
 
         current_state = "S0"
 
-        for char in cadena:
+        for char in word:
             llave = ""
+            alfabeto_key = None
+
+            for key in self.alfabeto:
+                if char in characters[key]:
+                    alfabeto_key = key
 
             for key, value in self.transiciones.items():
-                if value["name"] == current_state and value[char] is not None:
+                if value["name"] == current_state and value[alfabeto_key] is not None:
                     llave = key
-                elif value["name"] == current_state and value[char] is None:
+                elif value["name"] == current_state and value[alfabeto_key] is None:
                     return False
 
-            current_state = self.transiciones[llave][char]
+            current_state = self.transiciones[llave][alfabeto_key]
 
         for key, value in self.transiciones.items():
             if value["name"] == current_state:
