@@ -87,8 +87,7 @@ class CompilerDef():
 
         if self.lexical_errors or self.sintax_errors:
             print('\nPlease fix errors before continuing')
-            exit()
-
+            # exit()
 
     def get_tokens(self):
         # Gramatica Regular

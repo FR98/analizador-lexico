@@ -146,7 +146,6 @@ class LexGenerator:
         self.add_line("if lexical_errors:")
         self.add_line("    print('\\nLexical errors found on compiler definition file')")
 
-
     def write_lex_analyzer(self):
         # -------------------------------------------------------
         # Writing the lexical analyzer file

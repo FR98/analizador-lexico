@@ -23,6 +23,9 @@ def afd_test():
     re = "l(l|d)*"
     w = "var1"
 
+    re = "d(d)*"
+    w = "123"
+
     afd = AFD(re, draw=False)
 
     characters = {
