@@ -61,19 +61,24 @@ class Token():
     @classmethod
     def get_type_of(cls, word):
 
-        characters = {
+        characters = characters = {
             '"': '"',
             '\'': '\'',
-            's': '()@~!#$%^&*_+-=[]{}|;:,./<>?',
+            '/': '/',
+            '.': '.',
+            '(': '(',
+            ')': ')',
+            's': '@~!#$%^&*_+-=[]{}|;:,<>?',
             'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
             'd': '0123456789',
         }
 
         tokens_re = {
-            'ident': 'l(l|d)*',
-            'number': 'd(d)*',
-            'string': '"((l|d)|s)*"',
-            'char': '\'((l|d)|s)*\'',
+            'ident': 'l«l|d»*',
+            'number': 'd«d»*',
+            'string': '"««l|d»|s»*"',
+            'char': '\'««l|d»|s»*\'',
+            'comment': '//««l|d»|s»*',
         }
 
         if word in KEYWORDS.values():

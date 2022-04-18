@@ -13,6 +13,7 @@ def lexical_generator():
 
 def afd_test():
     """
+    https://elcodigoascii.com.ar
     34 - "
     35 - #
     39 - '
@@ -22,12 +23,14 @@ def afd_test():
     63 - ?
     124 - |
     126 - ~
-    190 - º
+    174 - «
+    175 - »
+    ¶¤¦§¨ª¬¯°±²³´µ·¸¹º×
     """
 
     re_tests = [{
         'name': 'ident',
-        're': 'l(l|d)*',
+        're': 'l«l|d»*',
         'tests' : [{
             'w': 'var1',
             'result': True
@@ -40,7 +43,7 @@ def afd_test():
         }]
     }, {
         'name': 'number',
-        're': 'd(d)*',
+        're': 'd«d»*',
         'tests' : [{
             'w': '123',
             'result': True
@@ -53,54 +56,57 @@ def afd_test():
         }]
     }, {
         'name': 'string',
-        're': '"((l|d)|s)*"',
+        're': '"««l|d»|s»*"',
         'tests' : [{
-            'w': '"string1)@"',
+            'w': '"string1@"',
             'result': True
         }, {
-            'w': '"string1)@',
+            'w': '"string1@',
             'result': False
         }, {
-            'w': 'string1)@""',
+            'w': 'string1@""',
             'result': False
         }]
     }, {
         'name': 'char',
-        're': '\'((l|d)|s)*\'',
+        're': '\'««l|d»|s»*\'',
         'tests' : [{
-            'w': '\'string1)@\'',
+            'w': '\'string1@\'',
             'result': True
         }, {
-            'w': '\'string1)@',
+            'w': '\'string1@',
             'result': False
         }, {
-            'w': 'string1)@\'\'',
+            'w': 'string1@\'\'',
             'result': False
         }]
     }, {
         'name': 'comment',
-        're': '//((l|d)|s)*',
+        're': '//««l|d»|s»*',
         'tests' : [{
-            'w': '//string1)@',
+            'w': '//string1@',
             'result': True
         }, {
-            'w': '/string1)@',
+            'w': '/string1@',
             'result': False
         }, {
-            'w': 'str//ing1)@',
+            'w': 'str//ing1»@',
             'result': False
         }]
     }, {
         'name': 'semantic_action',
-        're': '(.((l|d)|s)*.)',
+        're': '(.««l|d»|s»*.)',
         'tests' : [{
-            'w': '(.string1)@.)',
+            'w': '(.string1@.)',
             'result': True
         }, {
-            'w': '(.string1)@',
+            'w': '.string1@.',
             'result': False
         }, {
-            'w': 'string1)@.)',
+            'w': '(.string1@',
+            'result': False
+        }, {
+            'w': 'string1@.)',
             'result': False
         }]
     }]
@@ -110,12 +116,14 @@ def afd_test():
         '\'': '\'',
         '/': '/',
         '.': '.',
-        's': '()@~!#$%^&*_+-=[]{}|;:,<>?',
+        '(': '(',
+        ')': ')',
+        's': '@~!#$%^&*_+-=[]{}|;:,<>?',
         'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
         'd': '0123456789',
     }
 
-    # Attributes are written between < and >. Semantic actions are enclosed in (. and .). The operators + and - are used to form character sets.
+    # Attributes are written between < and >. The operators + and - are used to form character sets.
 
     error_found = False
     for re_test in re_tests:
