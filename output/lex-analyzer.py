@@ -32,14 +32,14 @@ TOKENS_RE = {
 
 # -------------------------------------------------------
 class Token():
-    def __init__(self, type, value, line, column):
-        self.type = type
+    def __init__(self, value, line, column):
         self.value = value
         self.line = line
         self.column = column
+        self.type = Token.get_type_of(value)
 
     def __str__(self):
-        return f'Token({self.type}, {self.value}, {self.line+1}, {self.column})'
+        return f'Token({self.value}, {self.type}, {self.line+1}, {self.column})'
 
     @classmethod
     def get_type_of(cls, word):
@@ -67,9 +67,7 @@ for line_index, line in enumerate(entry_file_lines):
     if line == '\n': continue
     words = line.replace('\n', '').split(' ')
     for word_index, word in enumerate(words):
-        TOKENS.append(
-            Token(Token.get_type_of(word), word, line_index, word_index)
-        )
+        TOKENS.append(Token(word, line_index, word_index))
 
 for token in TOKENS:
     print(token)
