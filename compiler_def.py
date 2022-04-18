@@ -53,11 +53,14 @@ class Token():
         characters = {
             'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
             'd': '0123456789',
+            's': '()@~!#$%^&*_+-=[]{}|;\':,./<>?',
+            '"': '"',
         }
 
         tokens_re = {
-            'id': 'l(l|d)*',
+            'ident': 'l(l|d)*',
             'number': 'd(d)*',
+            'string': '"((l|d)|s)*"'
         }
 
         if word in KEYWORDS.values():
@@ -95,7 +98,6 @@ class CompilerDef():
             if line == '\n': continue
             words = line.replace('\n', '').split(' ')
             for word_index, word in enumerate(words):
-                word = word.replace('.', '')
                 self.tokens.append(
                     Token(
                         Token.get_type_of(word),
