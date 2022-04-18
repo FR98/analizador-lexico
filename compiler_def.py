@@ -7,11 +7,13 @@
 # Lexical and Sintax Analyzer for Coco/L Compiler Definition
 
 from afd import AFD
+from log import Log
 
 # CHARACTERS
 CHARACTERS = {
     'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
     'digit': '0123456789',
+    'symbols': '()@~!#$%^&*_+-=[]{}|;:,./<>?',
 }
 
 # KEYWORDS
@@ -23,10 +25,19 @@ KEYWORDS = {
     'PRODUCTIONS': 'PRODUCTIONS',
     'END': 'END',
     'EXCEPT': 'EXCEPT',
-    '=': '=',
-    '+': '+',
-    '{': '{',
-    '}': '}',
+    'ANY': 'ANY',
+    'CONTEXT': 'CONTEXT',
+    'IGNORE': 'IGNORE',
+    'PRAGMAS': 'PRAGMAS',
+    'IGNORECASE': 'IGNORECASE',
+    'WEAK': 'WEAK',
+    'COMMENTS': 'COMMENTS',
+    'FROM': 'FROM',
+    'NESTED': 'NESTED',
+    'SYNC': 'SYNC',
+    'IF': 'IF',
+    'out': 'out',
+    'TO': 'TO',
 }
 
 # TOKENS RE
@@ -38,29 +49,31 @@ TOKENS_RE = {
 # -------------------------------------------------------
 
 class Token():
-    def __init__(self, type, value, line, column):
-        self.type = type
+    def __init__(self, value, line, column):
         self.value = value
         self.line = line
         self.column = column
+        self.type = Token.get_type_of(value)
 
     def __str__(self):
-        return f'Token({self.type}, {self.value}, {self.line+1}, {self.column})'
+        return f'Token({self.value}, {self.type}, {self.line+1}, {self.column})'
 
     @classmethod
     def get_type_of(cls, word):
 
         characters = {
+            '"': '"',
+            '\'': '\'',
+            's': '()@~!#$%^&*_+-=[]{}|;:,./<>?',
             'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
             'd': '0123456789',
-            's': '()@~!#$%^&*_+-=[]{}|;\':,./<>?',
-            '"': '"',
         }
 
         tokens_re = {
             'ident': 'l(l|d)*',
             'number': 'd(d)*',
-            'string': '"((l|d)|s)*"'
+            'string': '"((l|d)|s)*"',
+            'char': '\'((l|d)|s)*\'',
         }
 
         if word in KEYWORDS.values():
@@ -89,7 +102,7 @@ class CompilerDef():
         self.has_sintax_errors()
 
         if self.lexical_errors or self.sintax_errors:
-            print('\nPlease fix errors before continuing')
+            Log.WARNING('\nPlease fix errors before continuing')
             # exit()
 
     def get_tokens(self):
@@ -98,27 +111,20 @@ class CompilerDef():
             if line == '\n': continue
             words = line.replace('\n', '').split(' ')
             for word_index, word in enumerate(words):
-                self.tokens.append(
-                    Token(
-                        Token.get_type_of(word),
-                        word,
-                        line_index,
-                        word_index
-                    )
-                )
+                self.tokens.append(Token(word, line_index, word_index))
 
         for token in self.tokens:
             if token.type != 'ERROR':
-                print(token)
+                Log.INFO(token)
 
     def has_lexical_errors(self):
         for token in self.tokens:
             if token.type == 'ERROR':
-                print(f'Lexical error on line {token.line + 1} column {token.column}: {token.value}')
+                Log.WARNING(f'Lexical error on line {token.line + 1} column {token.column}: {token.value}')
                 self.lexical_errors = True
 
         if self.lexical_errors:
-            print('\nLexical errors found on compiler definition file')
+            Log.FAIL('\nLexical errors found on compiler definition file')
 
     def get_definitions(self):
         # Gramaticas libres de contexto
@@ -145,11 +151,11 @@ class CompilerDef():
         }
 
         self.PRODUCTIONS = {}
-    
+
     def has_sintax_errors(self):
         # for token in self.tokens:
         #     if token.type == 'ERROR':
         #         self.sintax_errors = True
 
         if self.sintax_errors:
-            print('\nSintax errors found on compiler definition file')
+            Log.FAIL('\nSintax errors found on compiler definition file')

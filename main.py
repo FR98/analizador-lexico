@@ -5,38 +5,8 @@
 # -------------------------------------------------------
 
 from afd import AFD
+from log import Log
 from lex_generator import LexGenerator
-
-class Log:
-    _BLUE = '\033[94m'
-    _CYAN = '\033[96m'
-    _GREEN = '\033[92m'
-    _YELLOW = '\033[93m'
-    _RED = '\033[91m'
-    _BOLD = '\033[1m'
-    _UNDERLINE = '\033[4m'
-    _END = '\033[0m'
-
-    def OKBLUE(*attr):
-        print(Log._BLUE, *attr, Log._END)
-
-    def OKCYAN(*attr):
-        print(Log._CYAN, *attr, Log._END)
-
-    def OKGREEN(*attr):
-        print(Log._GREEN, *attr, Log._END)
-
-    def WARNING(*attr):
-        print(Log._YELLOW, *attr, Log._END)
-
-    def FAIL(*attr):
-        print(Log._RED, *attr, Log._END)
-
-    def BOLD(*attr):
-        print(Log._BOLD, *attr, Log._END)
-
-    def UNDERLINE(*attr):
-        print(Log._UNDERLINE, *attr, Log._END)
 
 def lexical_generator():
     LexGenerator()
@@ -50,10 +20,9 @@ def afd_test():
     43 - +
     46 - .
     63 - ?
-    100 - d
-    108 - l
     124 - |
     126 - ~
+    190 - º
     """
 
     re_tests = [{
@@ -108,29 +77,59 @@ def afd_test():
             'w': 'string1)@\'\'',
             'result': False
         }]
+    }, {
+        'name': 'comment',
+        're': '//((l|d)|s)*',
+        'tests' : [{
+            'w': '//string1)@',
+            'result': True
+        }, {
+            'w': '/string1)@',
+            'result': False
+        }, {
+            'w': 'str//ing1)@',
+            'result': False
+        }]
+    }, {
+        'name': 'semantic_action',
+        're': '(.((l|d)|s)*.)',
+        'tests' : [{
+            'w': '(.string1)@.)',
+            'result': True
+        }, {
+            'w': '(.string1)@',
+            'result': False
+        }, {
+            'w': 'string1)@.)',
+            'result': False
+        }]
     }]
 
     characters = {
-        'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        'd': '0123456789',
-        's': '()@~!#$%^&*_+-=[]{}|;:,./<>?',
         '"': '"',
         '\'': '\'',
+        '/': '/',
+        '.': '.',
+        's': '()@~!#$%^&*_+-=[]{}|;:,<>?',
+        'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        'd': '0123456789',
     }
+
+    # Attributes are written between < and >. Semantic actions are enclosed in (. and .). The operators + and - are used to form character sets.
 
     error_found = False
     for re_test in re_tests:
-        Log.OKCYAN('\n\nTesting RE: ' + re_test['name'])
-        afd = AFD(re_test['re'], draw=False)
+        Log.INFO('\n\nTesting RE: ' + re_test['name'])
+        afd = AFD(re_test['re'], draw=False, print_tree=True)
 
         for test in re_test['tests']:
             result = afd.accepts(test['w'], characters)
 
             if result == test['result']:
-                Log.OKGREEN(re_test['re'], ' <- ', test['w'], ': ', result)
+                Log.OKGREEN(re_test['re'], ' <- ', test['w'], ': ', test['result'])
             else:
                 error_found = True
-                Log.FAIL(re_test['re'], ' <- ', test['w'], ': ', result)
+                Log.FAIL(re_test['re'], ' <- ', test['w'], ': ', test['result'])
 
     if error_found:
         Log.FAIL('\n\nTest failed')

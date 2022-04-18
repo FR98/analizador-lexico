@@ -5,6 +5,7 @@
 # -------------------------------------------------------
 
 import os
+from log import Log
 from compiler_def import CompilerDef
 
 class LexGenerator:
@@ -32,12 +33,12 @@ class LexGenerator:
         # -------------------------------------------------------
         # Extracting content from compiler definition file
         # -------------------------------------------------------
-        print('\nExtracting content from compiler definition file...')
+        Log.N('\nExtracting content from compiler definition file...')
 
         try:
             entry_file = open('input/compiler-def', 'r')
         except IOError:
-            print('\nFile not found or path is incorrect')
+            Log.FAIL('\nFile not found or path is incorrect')
             exit()
 
         entry_file_lines = entry_file.readlines()
@@ -45,13 +46,13 @@ class LexGenerator:
 
         self.compiler_def = CompilerDef(entry_file_lines)
 
-        print('\nContent extracted successfully!\n')
+        Log.OKGREEN('\nContent extracted successfully!\n')
 
     def lex_analyzer_construction(self):
         # -------------------------------------------------------
         # Construction of the lexical analyzer file
         # -------------------------------------------------------
-        print('\nConstruction of the lexical analyzer file started...')
+        Log.N('\nConstruction of the lexical analyzer file started...')
 
         self.add_header()
         self.add_enter()
@@ -86,14 +87,14 @@ class LexGenerator:
 
         self.add_line("# -------------------------------------------------------")
         self.add_line("class Token():")
-        self.add_line("    def __init__(self, type, value, line, column):")
-        self.add_line("        self.type = type")
+        self.add_line("    def __init__(self, value, line, column):")
         self.add_line("        self.value = value")
         self.add_line("        self.line = line")
         self.add_line("        self.column = column")
+        self.add_line("        self.type = Token.get_type_of(value)")
         self.add_enter()
         self.add_line("    def __str__(self):")
-        self.add_line("        return f'Token({self.type}, {self.value}, {self.line+1}, {self.column})'")
+        self.add_line("        return f'Token({self.value}, {self.type}, {self.line+1}, {self.column})'")
         self.add_enter()
         self.add_line("    @classmethod")
         self.add_line("    def get_type_of(cls, word):")
@@ -127,9 +128,7 @@ class LexGenerator:
         self.add_line("    if line == '\\n': continue")
         self.add_line("    words = line.replace('\\n', '').split(' ')")
         self.add_line("    for word_index, word in enumerate(words):")
-        self.add_line("        TOKENS.append(")
-        self.add_line("            Token(Token.get_type_of(word), word, line_index, word_index)")
-        self.add_line("        )")
+        self.add_line("        TOKENS.append(Token(word, line_index, word_index))")
         self.add_enter()
 
         self.add_line("for token in TOKENS:")
@@ -157,19 +156,19 @@ class LexGenerator:
                 lex_analyzer.write(line)
                 lex_analyzer.write("\n")
 
-            print('\nLexical analyzer file generated successfully.\n')
+            Log.OKGREEN('\nLexical analyzer file generated successfully.\n')
         except:
-            print('\nThere was an error opening and writing on the file.\n')
+            Log.FAIL('\nThere was an error opening and writing on the file.\n')
             exit()
         finally:
             lex_analyzer.close()
 
-        print('\nLexical analyzer generator finished.\n')
+        Log.N('\nLexical analyzer generator finished.\n')
 
         try:
-            print('\n\n\n\n\n# -------------------------------------------------------')
-            print('\nRunning lexical analyzer...')
+            Log.N('\n\n\n\n\n# -------------------------------------------------------')
+            Log.N('\nRunning lexical analyzer...')
             os.system('python3 output/lex-analyzer.py')
         except:
-            print('\nThere was an error running the lexical analyzer.')
+            Log.FAIL('\nThere was an error running the lexical analyzer.')
             exit()

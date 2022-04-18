@@ -19,11 +19,12 @@ class Estado:
 
 
 class AFD:
-    def __init__(self, re, draw=False):
+    def __init__(self, re, draw=False, print_tree=False):
         self.data = {}
         self.tree = None
         self.alfabeto = []
         self.transiciones = {}
+        self.print_tree = print_tree
         self.construct_tree(re)
         self.init_estados()
         self.get_transiciones()
@@ -35,7 +36,8 @@ class AFD:
         re = '(' + re + ')#'
         retree = RETree(re)
         self.tree = retree.get_tree()
-        print(self.tree)
+        if self.print_tree:
+            print(self.tree)
 
     def init_estados(self):
         cont = 1
@@ -48,7 +50,7 @@ class AFD:
 
         # Extraigo letras de la expresion
         for hoja in self.tree.leaves:
-            if regex.match(r'[a-zA-Z"\']', self.data[str(hoja.value)].val) and self.data[str(hoja.value)].val not in self.alfabeto:
+            if regex.match(r'[a-zA-Z"\'/.]', self.data[str(hoja.value)].val) and self.data[str(hoja.value)].val not in self.alfabeto:
                 self.alfabeto.append(self.data[str(hoja.value)].val)
 
         self.alfabeto.sort()
@@ -157,9 +159,9 @@ class AFD:
 
     def anul(self, node):
         # Es anul si te puede devolver Epsilon (~)
-        if self.data[str(node.value)].val == '|':
+        if self.data[str(node.value)].val == '|' and node.left and node.right:
             self.data[str(node.value)].anul = self.data[str(node.left.value)].anul or self.data[str(node.right.value)].anul
-        elif self.data[str(node.value)].val == '.':
+        elif self.data[str(node.value)].val == '.' and node.left and node.right:
             self.data[str(node.value)].anul = self.data[str(node.left.value)].anul and self.data[str(node.right.value)].anul
         elif self.data[str(node.value)].val in ['*', '?', '~']:
             self.data[str(node.value)].anul = True
@@ -167,11 +169,11 @@ class AFD:
             self.data[str(node.value)].anul = False
 
     def prima_y_ult(self, node):
-        if self.data[str(node.value)].val in ['|', '?']:
+        if self.data[str(node.value)].val in ['|', '?'] and node.left and node.right:
             # Se obtienen todas las primeras posiciones de ambos hijos
             self.data[str(node.value)].prima_pos = [item for sublist in [self.data[str(node.left.value)].prima_pos, self.data[str(node.right.value)].prima_pos] for item in sublist]
             self.data[str(node.value)].ult_pos = [item for sublist in [self.data[str(node.left.value)].ult_pos, self.data[str(node.right.value)].ult_pos] for item in sublist]
-        elif self.data[str(node.value)].val == '.':
+        elif self.data[str(node.value)].val == '.' and node.left and node.right:
             if self.data[str(node.left.value)].anul:
                 # Si el hijo izquierdo es anul, se obtiene la primera posición de sus hijos
                 self.data[str(node.value)].prima_pos = [item for sublist in [self.data[str(node.left.value)].prima_pos, self.data[str(node.right.value)].prima_pos] for item in sublist]
@@ -196,7 +198,7 @@ class AFD:
 
     def next_pos(self, node):
         # Para cada una de las ultimas posiciones se agregan las ultimas posiciones de sus hijos de la derecha
-        if self.data[str(node.value)].val == '.':
+        if self.data[str(node.value)].val == '.' and node.left and node.right:
             for ult_pos in self.data[str(node.left.value)].ult_pos:
                 for prim_pos in self.data[str(node.right.value)].prima_pos:
                     if prim_pos not in self.data[str(node.left.value)].next_pos:
