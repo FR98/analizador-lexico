@@ -50,7 +50,7 @@ class AFD:
 
         # Extraigo letras de la expresion
         for hoja in self.tree.leaves:
-            if regex.match(r'[a-zA-Z"\'/.()]', self.data[str(hoja.value)].val) and self.data[str(hoja.value)].val not in self.alfabeto:
+            if regex.match(r'[a-zA-Z"\'/*=.|()[\]{}]', self.data[str(hoja.value)].val) and self.data[str(hoja.value)].val not in self.alfabeto:
                 self.alfabeto.append(self.data[str(hoja.value)].val)
 
         self.alfabeto.sort()
@@ -159,17 +159,17 @@ class AFD:
 
     def anul(self, node):
         # Es anul si te puede devolver Epsilon (~)
-        if self.data[str(node.value)].val == '|' and node.left and node.right:
+        if self.data[str(node.value)].val == '¦' and node.left and node.right:
             self.data[str(node.value)].anul = self.data[str(node.left.value)].anul or self.data[str(node.right.value)].anul
         elif self.data[str(node.value)].val == '.' and node.left and node.right:
             self.data[str(node.value)].anul = self.data[str(node.left.value)].anul and self.data[str(node.right.value)].anul
-        elif self.data[str(node.value)].val in ['*', '?', '~']:
+        elif self.data[str(node.value)].val in ['±', '?', '~']:
             self.data[str(node.value)].anul = True
         else:
             self.data[str(node.value)].anul = False
 
     def prima_y_ult(self, node):
-        if self.data[str(node.value)].val in ['|', '?'] and node.left and node.right:
+        if self.data[str(node.value)].val in ['¦', '?'] and node.left and node.right:
             # Se obtienen todas las primeras posiciones de ambos hijos
             self.data[str(node.value)].prima_pos = [item for sublist in [self.data[str(node.left.value)].prima_pos, self.data[str(node.right.value)].prima_pos] for item in sublist]
             self.data[str(node.value)].ult_pos = [item for sublist in [self.data[str(node.left.value)].ult_pos, self.data[str(node.right.value)].ult_pos] for item in sublist]
@@ -185,7 +185,7 @@ class AFD:
                 self.data[str(node.value)].ult_pos = [item for sublist in [self.data[str(node.left.value)].ult_pos, self.data[str(node.right.value)].ult_pos] for item in sublist]
             else:
                 self.data[str(node.value)].ult_pos = [item for sublist in [self.data[str(node.right.value)].ult_pos] for item in sublist]
-        elif self.data[str(node.value)].val in ['*', '+']:
+        elif self.data[str(node.value)].val in ['±', '+']:
             # Se obtiene la primera posición de su hijo
             self.data[str(node.value)].prima_pos = [item for sublist in [self.data[str(node.left.value)].prima_pos] for item in sublist]
             self.data[str(node.value)].ult_pos = [item for sublist in [self.data[str(node.left.value)].ult_pos] for item in sublist]
@@ -205,7 +205,7 @@ class AFD:
                         self.data[str(ult_pos)].next_pos.append(prim_pos)
 
         # Para cada ultima posicion de su hijo se agregan las ultimas posiciones de sus hijos de la derecha
-        elif self.data[str(node.value)].val == '*':
+        elif self.data[str(node.value)].val == '±':
             for ult_pos in self.data[str(node.left.value)].ult_pos:
                 for prim_pos in self.data[str(node.left.value)].prima_pos:
                     if prim_pos not in self.data[str(node.left.value)].next_pos:

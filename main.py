@@ -25,12 +25,78 @@ def afd_test():
     126 - ~
     174 - «
     175 - »
+    221 - ¦
+    241 - ±
     ¶¤¦§¨ª¬¯°±²³´µ·¸¹º×
     """
 
     re_tests = [{
+        'name': 'assign',
+        're': '=',
+        'tests' : [{
+            'w': '=',
+            'result': True
+        }]
+    }, {
+        'name': 'final',
+        're': '.',
+        'tests' : [{
+            'w': '.',
+            'result': True
+        }]
+    }, {
+        'name': 'or',
+        're': '|',
+        'tests' : [{
+            'w': '|',
+            'result': True
+        }]
+    }, {
+        'name': 'group',
+        're': '(¦)',
+        'tests' : [{
+            'w': '(',
+            'result': True
+        }, {
+            'w': ')',
+            'result': True
+        }]
+    }, {
+        'name': 'option',
+        're': '[¦]',
+        'tests' : [{
+            'w': '[',
+            'result': True
+        }, {
+            'w': ']',
+            'result': True
+        }]
+    }, {
+        'name': 'iteration',
+        're': '{¦}',
+        'tests' : [{
+            'w': '{',
+            'result': True
+        }, {
+            'w': '}',
+            'result': True
+        }]
+    }, {
+        'name': 'operator',
+        're': 'o',
+        'tests' : [{
+            'w': '+',
+            'result': True
+        }, {
+            'w': '-',
+            'result': True
+        }, {
+            'w': '+-',
+            'result': False
+        }]
+    }, {
         'name': 'ident',
-        're': 'l«l|d»*',
+        're': 'l«l¦d»±',
         'tests' : [{
             'w': 'var1',
             'result': True
@@ -43,7 +109,7 @@ def afd_test():
         }]
     }, {
         'name': 'number',
-        're': 'd«d»*',
+        're': 'd«d»±',
         'tests' : [{
             'w': '123',
             'result': True
@@ -56,7 +122,7 @@ def afd_test():
         }]
     }, {
         'name': 'string',
-        're': '"««l|d»|s»*"',
+        're': '"««l¦d»¦s»±"',
         'tests' : [{
             'w': '"string1@"',
             'result': True
@@ -69,7 +135,7 @@ def afd_test():
         }]
     }, {
         'name': 'char',
-        're': '\'««l|d»|s»*\'',
+        're': '\'««l¦d»¦s»±\'',
         'tests' : [{
             'w': '\'string1@\'',
             'result': True
@@ -82,7 +148,7 @@ def afd_test():
         }]
     }, {
         'name': 'comment',
-        're': '//««l|d»|s»*',
+        're': '//««l¦d»¦s»±',
         'tests' : [{
             'w': '//string1@',
             'result': True
@@ -95,7 +161,7 @@ def afd_test():
         }]
     }, {
         'name': 'semantic_action',
-        're': '(.««l|d»|s»*.)',
+        're': '(.««l¦d»¦s»±.)',
         'tests' : [{
             'w': '(.string1@.)',
             'result': True
@@ -115,15 +181,25 @@ def afd_test():
         '"': '"',
         '\'': '\'',
         '/': '/',
+        '*': '*',
+        '=': '=',
         '.': '.',
+        '|': '|',
         '(': '(',
         ')': ')',
-        's': '@~!#$%^&*_+-=[]{}|;:,<>?',
+        '[': '[',
+        ']': ']',
+        '{': '{',
+        '}': '}',
+        'o': '+-',
+        's': '@~!#$%^&_;:,<>?',
         'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
         'd': '0123456789',
     }
 
-    # Attributes are written between < and >. The operators + and - are used to form character sets.
+    Log.INFO('Tokens RE')
+    for re_test in re_tests:
+        Log.N(re_test['name'])
 
     error_found = False
     for re_test in re_tests:
@@ -144,5 +220,5 @@ def afd_test():
     else:
         Log.OKGREEN('\n\nTest passed')
 
-# lexical_generator()
 afd_test()
+# lexical_generator()

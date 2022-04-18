@@ -61,24 +61,39 @@ class Token():
     @classmethod
     def get_type_of(cls, word):
 
-        characters = characters = {
+        characters = {
             '"': '"',
             '\'': '\'',
             '/': '/',
+            '*': '*',
+            '=': '=',
             '.': '.',
+            '|': '|',
             '(': '(',
             ')': ')',
-            's': '@~!#$%^&*_+-=[]{}|;:,<>?',
+            '[': '[',
+            ']': ']',
+            '{': '{',
+            '}': '}',
+            'o': '+-',
+            's': '@~!#$%^&_;:,<>?',
             'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
             'd': '0123456789',
         }
 
         tokens_re = {
-            'ident': 'l«l|d»*',
-            'number': 'd«d»*',
-            'string': '"««l|d»|s»*"',
-            'char': '\'««l|d»|s»*\'',
-            'comment': '//««l|d»|s»*',
+            'assign': '=',
+            'final': '.',
+            'or': '|',
+            'group': '(¦)',
+            'option': '[¦]',
+            'iteration': '{¦}',
+            'operator': 'o',
+            'ident': 'l«l¦d»±',
+            'number': 'd«d»±',
+            'string': '"««l¦d»¦s»±"',
+            'char': '\'««l¦d»¦s»±\'',
+            'comment': '//«««l¦d»¦s»¦o»±',
         }
 
         if word in KEYWORDS.values():
