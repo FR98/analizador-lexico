@@ -94,7 +94,7 @@ class Token():
             'ident': 'l«l¦d»±',
             'number': 'd«d»±',
             'string': '"««««l¦d»¦s»¦o»¦ »±"',
-            'char': '\'«««l¦d»¦s»¦o»±\'',
+            'char': '«\'«««l¦d»¦s»¦o»»\'',
             'comment': '//««««l¦d»¦s»¦o»¦ »±',
             'comment_block': '«/*««««l¦d»¦s»¦o»¦ »±*»/',
             'semantic_action': '«(.««««l¦d»¦s»¦o»¦ »±.»)',

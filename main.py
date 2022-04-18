@@ -148,9 +148,15 @@ def afd_test():
         }]
     }, {
         'name': 'char',
-        're': '\'«««l¦d»¦s»¦o»±\'',
+        're': '«\'«««l¦d»¦s»¦o»»\'',
         'tests' : [{
             'w': '\'2\'',
+            'result': True
+        }, {
+            'w': '\'a\'',
+            'result': True
+        }, {
+            'w': '\'@\'',
             'result': True
         }, {
             'w': '\'string1@',
