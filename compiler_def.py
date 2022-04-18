@@ -62,6 +62,7 @@ class Token():
     def get_type_of(cls, word):
 
         characters = {
+            ' ': ' ',
             '"': '"',
             '\'': '\'',
             '/': '/',
@@ -82,6 +83,7 @@ class Token():
         }
 
         tokens_re = {
+            'space': ' ',
             'assign': '=',
             'final': '.',
             'or': '|',
@@ -91,9 +93,11 @@ class Token():
             'operator': 'o',
             'ident': 'l«l¦d»±',
             'number': 'd«d»±',
-            'string': '"««l¦d»¦s»±"',
-            'char': '\'««l¦d»¦s»±\'',
-            'comment': '//«««l¦d»¦s»¦o»±',
+            'string': '"««««l¦d»¦s»¦o»¦ »±"',
+            'char': '\'«««l¦d»¦s»¦o»±\'',
+            'comment': '//««««l¦d»¦s»¦o»¦ »±',
+            'comment_block': '«/*««««l¦d»¦s»¦o»¦ »±*»/',
+            'semantic_action': '«(.««««l¦d»¦s»¦o»¦ »±.»)',
         }
 
         if word in KEYWORDS.values():

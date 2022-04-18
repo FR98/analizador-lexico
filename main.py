@@ -27,10 +27,17 @@ def afd_test():
     175 - »
     221 - ¦
     241 - ±
-    ¶¤¦§¨ª¬¯°±²³´µ·¸¹º×
+    ¶¤§¨ª¬¯°²³´µ·¸¹º×
     """
 
     re_tests = [{
+        'name': 'space',
+        're': ' ',
+        'tests' : [{
+            'w': ' ',
+            'result': True
+        }]
+    }, {
         'name': 'assign',
         're': '=',
         'tests' : [{
@@ -122,9 +129,15 @@ def afd_test():
         }]
     }, {
         'name': 'string',
-        're': '"««l¦d»¦s»±"',
+        're': '"««««l¦d»¦s»¦o»¦ »±"',
         'tests' : [{
             'w': '"string1@"',
+            'result': True
+        }, {
+            'w': '"hola mundo"',
+            'result': True
+        }, {
+            'w': '"hola  mundo"',
             'result': True
         }, {
             'w': '"string1@',
@@ -135,9 +148,9 @@ def afd_test():
         }]
     }, {
         'name': 'char',
-        're': '\'««l¦d»¦s»±\'',
+        're': '\'«««l¦d»¦s»¦o»±\'',
         'tests' : [{
-            'w': '\'string1@\'',
+            'w': '\'2\'',
             'result': True
         }, {
             'w': '\'string1@',
@@ -148,9 +161,12 @@ def afd_test():
         }]
     }, {
         'name': 'comment',
-        're': '//««l¦d»¦s»±',
+        're': '//««««l¦d»¦s»¦o»¦ »±',
         'tests' : [{
             'w': '//string1@',
+            'result': True
+        }, {
+            'w': '//hola mundo 1 @',
             'result': True
         }, {
             'w': '/string1@',
@@ -160,10 +176,29 @@ def afd_test():
             'result': False
         }]
     }, {
+        'name': 'comment_block',
+        're': '«/*««««l¦d»¦s»¦o»¦ »±*»/',
+        'tests' : [{
+            'w': '/*string1@*/',
+            'result': True
+        }, {
+            'w': '/*string 1 @ */',
+            'result': True
+        }, {
+            'w': '/*string1@',
+            'result': False
+        }, {
+            'w': 'str/**/ing1»@',
+            'result': False
+        }]
+    }, {
         'name': 'semantic_action',
-        're': '(.««l¦d»¦s»±.)',
+        're': '«(.««««l¦d»¦s»¦o»¦ »±.»)',
         'tests' : [{
             'w': '(.string1@.)',
+            'result': True
+        }, {
+            'w': '(.string1 @.)',
             'result': True
         }, {
             'w': '.string1@.',
@@ -178,6 +213,7 @@ def afd_test():
     }]
 
     characters = {
+        ' ': ' ',
         '"': '"',
         '\'': '\'',
         '/': '/',
@@ -199,7 +235,7 @@ def afd_test():
 
     Log.INFO('Tokens RE')
     for re_test in re_tests:
-        Log.N(re_test['name'])
+        Log.N(f"'{re_test['name']}': '{re_test['re']}',")
 
     error_found = False
     for re_test in re_tests:
@@ -221,4 +257,4 @@ def afd_test():
         Log.OKGREEN('\n\nTest passed')
 
 afd_test()
-# lexical_generator()
+lexical_generator()
