@@ -11,9 +11,24 @@ from log import Log
 
 # CHARACTERS
 CHARACTERS = {
-    'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    'digit': '0123456789',
-    'symbols': '()@~!#$%^&*_+-=[]{}|;:,./<>?',
+    ' ': ' ',
+    '"': '"',
+    '\'': '\'',
+    '/': '/',
+    '*': '*',
+    '=': '=',
+    '.': '.',
+    '|': '|',
+    '(': '(',
+    ')': ')',
+    '[': '[',
+    ']': ']',
+    '{': '{',
+    '}': '}',
+    'o': '+-',
+    's': '@~!#$%^&_;:,<>?',
+    'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    'd': '0123456789',
 }
 
 # KEYWORDS
@@ -42,8 +57,21 @@ KEYWORDS = {
 
 # TOKENS RE
 TOKENS_RE = {
-    'id': 'letter {letter|digit} EXCEPT KEYWORDS',
-    'number': 'digit{digit}',
+    'space': ' ',
+    'assign': '=',
+    'final': '.',
+    'or': '|',
+    'group': '(¦)',
+    'option': '[¦]',
+    'iteration': '{¦}',
+    'operator': 'o',
+    'ident': 'l«l¦d»±',
+    'number': 'd«d»±',
+    'string': '"««««l¦d»¦s»¦o»¦ »±"',
+    'char': '«\'«««l¦d»¦s»¦o»»\'',
+    'comment': '//««««l¦d»¦s»¦o»¦ »±',
+    'comment_block': '«/*««««l¦d»¦s»¦o»¦ »±*»/',
+    'semantic_action': '«(.««««l¦d»¦s»¦o»¦ »±.»)',
 }
 
 # -------------------------------------------------------
@@ -60,51 +88,11 @@ class Token():
 
     @classmethod
     def get_type_of(cls, word):
-
-        characters = {
-            ' ': ' ',
-            '"': '"',
-            '\'': '\'',
-            '/': '/',
-            '*': '*',
-            '=': '=',
-            '.': '.',
-            '|': '|',
-            '(': '(',
-            ')': ')',
-            '[': '[',
-            ']': ']',
-            '{': '{',
-            '}': '}',
-            'o': '+-',
-            's': '@~!#$%^&_;:,<>?',
-            'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-            'd': '0123456789',
-        }
-
-        tokens_re = {
-            'space': ' ',
-            'assign': '=',
-            'final': '.',
-            'or': '|',
-            'group': '(¦)',
-            'option': '[¦]',
-            'iteration': '{¦}',
-            'operator': 'o',
-            'ident': 'l«l¦d»±',
-            'number': 'd«d»±',
-            'string': '"««««l¦d»¦s»¦o»¦ »±"',
-            'char': '«\'«««l¦d»¦s»¦o»»\'',
-            'comment': '//««««l¦d»¦s»¦o»¦ »±',
-            'comment_block': '«/*««««l¦d»¦s»¦o»¦ »±*»/',
-            'semantic_action': '«(.««««l¦d»¦s»¦o»¦ »±.»)',
-        }
-
         if word in KEYWORDS.values():
             return 'KEYWORD'
         else:
-            for token_type, re in tokens_re.items():
-                if AFD(re).accepts(word, characters):
+            for token_type, re in TOKENS_RE.items():
+                if AFD(re).accepts(word, CHARACTERS):
                     return token_type
         return 'ERROR'
 
