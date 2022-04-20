@@ -121,9 +121,48 @@ class CompilerDef():
         # Gramatica Regular
         for line_index, line in enumerate(self.file_lines):
             if line == '\n': continue
-            words = line.replace('\n', '').split(' ')
-            for word_index, word in enumerate(words):
-                self.tokens.append(Token(word, line_index, word_index))
+            # words = line.replace('\n', '').split(' ')
+            # for word_index, word in enumerate(words):
+            #     self.tokens.append(Token(word, line_index, word_index))
+            i = 0
+            current_line_recognized_tokens = []
+            while i < len(line):
+                current_token = None
+                next_token = None
+                avance = 0
+                continuar = True
+                while continuar:
+                    if current_token and next_token:
+                        if current_token.type != 'ERROR' and next_token.type == 'ERROR':
+                            continuar = False
+                            break
+
+                    if i + avance > len(line):
+                        continuar = False
+                        break
+
+                    if i + avance < len(line):
+                        current_token = Token(line[i:i + avance], line_index, i)
+
+                    avance += 1
+
+                    if i + avance < len(line):
+                        next_token = Token(line[i:i + avance], line_index, i)
+
+                    Log.WARNING(current_token)
+
+                i = i + avance
+
+                if current_token and current_token.type != 'ERROR':
+                    Log.INFO(current_token)
+                    self.tokens.append(current_token)
+                    current_line_recognized_tokens.append(current_token)
+                else:
+                    Log.FAIL(current_token)
+                    # Si se llega al final de la linea y no se reconoce ningun token,
+                    # se agrega la siguiente linea y se vuelve a intentar.
+                    if i == len(line) + 1 and len(current_line_recognized_tokens) == 0:
+                        print(f'AVER: {line}')
 
         for token in self.tokens:
             if token.type != 'ERROR':

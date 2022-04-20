@@ -262,5 +262,5 @@ def afd_test():
     else:
         Log.OKGREEN('\n\nTest passed')
 
-afd_test()
+# afd_test()
 lexical_generator()

@@ -1,6 +1,11 @@
-COMPILER Ejemplo
-//----------CommnetHelloWorld----------
-/*----------Commnet----------*/
+COMPILER /* Ejemplo
+
+//---------- Commnet Hello World ----------
+
+/*
+    ---------- Commnet ----------
+*/
+
 (.
 /*----------Scanner Specification----------*/
 .)
