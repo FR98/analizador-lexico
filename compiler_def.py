@@ -181,7 +181,7 @@ class CompilerDef():
                 # se agrega la siguiente linea y se vuelve a intentar.
                 if line_position == len(line) + 1 and len(current_line_recognized_tokens) == 0:
                     if line_index < len(self.file_lines) - 1:
-                        new_line = line + " " + self.file_lines[line_index + 1].replace('\n', '')
+                        new_line = line + ' ' + self.file_lines[line_index + 1].replace('\n', '')
                         line_index += 1
                         Log.INFO('Trying: ', new_line)
                         analyzed_lines += self.eval_line(new_line, line_index)
@@ -220,6 +220,31 @@ class CompilerDef():
             'id': 'letter {letter|digit} EXCEPT KEYWORDS',
             'number': 'digit{digit}',
             'hexnumber': 'hexdigit {hexdigit} "(H)"',
+        }
+
+        self.PRODUCTIONS = {}
+
+        # ---------------------------------------------------------------
+
+        self.COMPILER_NAME = 'Ejemplo'
+
+        self.CHARACTERS = {
+            ' ': ' ',
+            'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            'd': '0123456789',
+            'h': '0123456789ABCDEF',
+        }
+
+        self.KEYWORDS = {
+            'if': 'if',
+            'while': 'while',
+        }
+
+        self.TOKENS_RE = {
+            'id': 'l«l¦d»±',
+            'number': 'd«d»±',
+            'hexnumber': 'h«h»±',
+            'space': ' ',
         }
 
         self.PRODUCTIONS = {}

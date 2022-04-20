@@ -1,6 +1,6 @@
 # -------------------------------------------------------
 # Diseño de Lenguajes de Programación
-# Lexical Analyzer Generator Main
+# Log
 # Francisco Rosal - 18676
 # -------------------------------------------------------
 
