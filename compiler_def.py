@@ -79,12 +79,12 @@ TOKENS_RE = {
 class Token():
     def __init__(self, value, line, column):
         self.value = value
-        self.line = line
-        self.column = column
+        self.line = line + 1
+        self.column = column + 1
         self.type = Token.get_type_of(value)
 
     def __str__(self):
-        return f'Token({self.value}, {self.type}, {self.line+1}, {self.column})'
+        return f'Token({self.value}, {self.type}, {self.line}, {self.column})'
 
     @classmethod
     def get_type_of(cls, word):
@@ -119,59 +119,77 @@ class CompilerDef():
 
     def get_tokens(self):
         # Gramatica Regular
-        for line_index, line in enumerate(self.file_lines):
-            if line == '\n': continue
+        line_index = 0
+        while line_index < len(self.file_lines):
             # words = line.replace('\n', '').split(' ')
             # for word_index, word in enumerate(words):
             #     self.tokens.append(Token(word, line_index, word_index))
-            i = 0
-            current_line_recognized_tokens = []
-            while i < len(line):
-                current_token = None
-                next_token = None
-                avance = 0
-                continuar = True
-                while continuar:
-                    if current_token and next_token:
-                        if current_token.type != 'ERROR' and next_token.type == 'ERROR':
-                            continuar = False
-                            break
+            line = self.file_lines[line_index].replace('\n', '')
+            analyzed_lines = self.eval_line(line, line_index)
+            line_index += analyzed_lines
 
-                    if i + avance > len(line):
-                        continuar = False
-                        break
-
-                    if i + avance < len(line):
-                        current_token = Token(line[i:i + avance], line_index, i)
-
-                    avance += 1
-
-                    if i + avance < len(line):
-                        next_token = Token(line[i:i + avance], line_index, i)
-
-                    Log.WARNING(current_token)
-
-                i = i + avance
-
-                if current_token and current_token.type != 'ERROR':
-                    Log.INFO(current_token)
-                    self.tokens.append(current_token)
-                    current_line_recognized_tokens.append(current_token)
-                else:
-                    Log.FAIL(current_token)
-                    # Si se llega al final de la linea y no se reconoce ningun token,
-                    # se agrega la siguiente linea y se vuelve a intentar.
-                    if i == len(line) + 1 and len(current_line_recognized_tokens) == 0:
-                        print(f'AVER: {line}')
-
+        Log.OKGREEN('\n\nTokens found:')
         for token in self.tokens:
             if token.type != 'ERROR':
                 Log.INFO(token)
+    
+    def eval_line(self, line, line_index):
+        analyzed_lines = 1
+        line_position = 0
+        current_line_recognized_tokens = []
+        while line_position < len(line):
+            current_token = None
+            next_token = None
+            avance = 0
+            continuar = True
+            while continuar:
+                if current_token and next_token:
+                    if current_token.type != 'ERROR' and next_token.type == 'ERROR':
+                        continuar = False
+                        break
+
+                if line_position + avance > len(line):
+                    continuar = False
+                    break
+
+                if line_position + avance <= len(line):
+                    current_token = Token(line[line_position:line_position + avance], line_index, line_position)
+
+                avance += 1
+
+                if line_position + avance <= len(line):
+                    next_token = Token(line[line_position:line_position + avance], line_index, line_position)
+
+                Log.WARNING(current_token)
+
+            line_position = line_position + avance
+
+
+            if current_token and current_token.type != 'ERROR':
+                Log.INFO(current_token)
+                self.tokens.append(current_token)
+                current_line_recognized_tokens.append(current_token)
+            else:
+                Log.FAIL(current_token)
+
+                if line_position == len(line) + 1 and len(current_line_recognized_tokens) != 0:
+                    self.tokens.append(current_token)
+
+                # Si se llega al final de la linea y no se reconoce ningun token,
+                # se agrega la siguiente linea y se vuelve a intentar.
+                if line_position == len(line) + 1 and len(current_line_recognized_tokens) == 0:
+                    if line_index < len(self.file_lines) - 1:
+                        new_line = line + " " + self.file_lines[line_index + 1].replace('\n', '')
+                        line_index += 1
+                        Log.INFO('Trying: ', new_line)
+                        analyzed_lines += self.eval_line(new_line, line_index)
+
+        return analyzed_lines
 
     def has_lexical_errors(self):
         for token in self.tokens:
             if token.type == 'ERROR':
-                Log.WARNING(f'Lexical error on line {token.line + 1} column {token.column}: {token.value}')
+                Log.WARNING(f'Lexical error on line {token.line} column {token.column}: {token.value}')
                 self.lexical_errors = True
 
         if self.lexical_errors:

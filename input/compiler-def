@@ -1,13 +1,14 @@
+COMPILER Ejemplo
 COMPILER /* Ejemplo
 
-//---------- Commnet Hello World ----------
+// -- Hello World --
 
 /*
-    ---------- Commnet ----------
+    -- Comment --
 */
 
 (.
-/*----------Scanner Specification----------*/
+/* -- Scanner Specification -- */
 .)
 
 CHARACTERS
