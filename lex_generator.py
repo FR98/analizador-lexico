@@ -41,7 +41,6 @@ class LexGenerator:
             Log.FAIL('\nFile not found or path is incorrect')
             exit()
 
-        # TODO: Change to centinel read (unir todo en una linea y no separar por espacios)
         entry_file_lines = entry_file.readlines()
         entry_file.close()
 
