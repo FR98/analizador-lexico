@@ -9,6 +9,8 @@
 from afd import AFD
 from log import Log
 
+ANY_BUT_QUOTES = '«««««««««««««««l¦d»¦s»¦o»¦ »¦(»¦)»¦/»¦*»¦=»¦.»¦|»¦[»¦]»¦{»¦}»'
+
 # CHARACTERS
 CHARACTERS = {
     ' ': ' ',
@@ -57,20 +59,20 @@ KEYWORDS = {
 
 # TOKENS RE
 TOKENS_RE = {
-    'semantic_action': '«(.««««l¦d»¦s»¦o»¦ »±.»)',
-    'comment_block': '«/*««««l¦d»¦s»¦o»¦ »±*»/',
+    'semantic_action': '«(.««a¦"»¦\'»±.»)',
+    'comment_block': '«/*««a¦"»¦\'»±*»/',
     'comment': '//««««l¦d»¦s»¦o»¦ »±',
-    'string': '"««««l¦d»¦s»¦o»¦ »±"',
-    'char': '«\'«««l¦d»¦s»¦o»»\'',
+    'char': '«\'«a¦"»±»\'',
+    'string': '"«a¦\'»±"',
     'number': 'd«d»±',
     'ident': 'l«l¦d»±',
     'operator': 'o',
     'iteration': '{¦}',
     'option': '[¦]',
     'group': '(¦)',
-    'assign': '=',
-    'final': '.',
     'or': '|',
+    'final': '.',
+    'assign': '=',
     'space': ' ',
 }
 
@@ -92,7 +94,7 @@ class Token():
             return 'KEYWORD'
         else:
             for token_type, re in TOKENS_RE.items():
-                if AFD(re).accepts(word, CHARACTERS):
+                if AFD(re.replace('a', ANY_BUT_QUOTES)).accepts(word, CHARACTERS):
                     return token_type
         return 'ERROR'
 
@@ -160,13 +162,13 @@ class CompilerDef():
                 if line_position + avance <= len(line):
                     next_token = Token(line[line_position:line_position + avance], line_index, line_position)
 
-                Log.WARNING(current_token)
+                # Log.WARNING(current_token)
 
             line_position = line_position + avance
 
 
             if current_token and current_token.type != 'ERROR':
-                Log.INFO(current_token)
+                # Log.INFO(current_token)
                 self.tokens.append(current_token)
                 current_line_recognized_tokens.append(current_token)
             else:

@@ -8,6 +8,8 @@ from afd import AFD
 from log import Log
 from lex_generator import LexGenerator
 
+ANY_BUT_QUOTES = '«««««««««««««««l¦d»¦s»¦o»¦ »¦(»¦)»¦/»¦*»¦=»¦.»¦|»¦[»¦]»¦{»¦}»'
+
 def lexical_generator():
     LexGenerator()
 
@@ -129,7 +131,7 @@ def afd_test():
         }]
     }, {
         'name': 'string',
-        're': '"««««l¦d»¦s»¦o»¦ »±"',
+        're': '"«a¦\'»±"',
         'tests' : [{
             'w': '"string1@"',
             'result': True
@@ -137,7 +139,7 @@ def afd_test():
             'w': '"hola mundo"',
             'result': True
         }, {
-            'w': '"hola  mundo"',
+            'w': '"hola  mundo\')$*"',
             'result': True
         }, {
             'w': '"string1@',
@@ -148,7 +150,7 @@ def afd_test():
         }]
     }, {
         'name': 'char',
-        're': '«\'«««l¦d»¦s»¦o»»\'',
+        're': '«\'«a¦"»±»\'',
         'tests' : [{
             'w': '\'2\'',
             'result': True
@@ -157,6 +159,12 @@ def afd_test():
             'result': True
         }, {
             'w': '\'@\'',
+            'result': True
+        }, {
+            'w': '\'*\'',
+            'result': True
+        }, {
+            'w': '\'"\'',
             'result': True
         }, {
             'w': '\'string1@',
@@ -183,12 +191,12 @@ def afd_test():
         }]
     }, {
         'name': 'comment_block',
-        're': '«/*««««l¦d»¦s»¦o»¦ »±*»/',
+        're': '«/*««a¦"»¦\'»±*»/',
         'tests' : [{
             'w': '/*string1@*/',
             'result': True
         }, {
-            'w': '/*string 1 @ */',
+            'w': '/*string 1 \' " @ */',
             'result': True
         }, {
             'w': '/*string1@',
@@ -199,12 +207,15 @@ def afd_test():
         }]
     }, {
         'name': 'semantic_action',
-        're': '«(.««««l¦d»¦s»¦o»¦ »±.»)',
+        're': '«(.««a¦"»¦\'»±.»)',
         'tests' : [{
             'w': '(.string1@.)',
             'result': True
         }, {
             'w': '(.string1 @.)',
+            'result': True
+        }, {
+            'w': '(. string1 " \' @ .)',
             'result': True
         }, {
             'w': '.string1@.',
@@ -240,13 +251,17 @@ def afd_test():
     }
 
     Log.INFO('Tokens RE')
-    for re_test in re_tests:
+    for re_test in re_tests[::-1]:
         Log.N(f"'{re_test['name']}': '{re_test['re']}',")
 
     error_found = False
     for re_test in re_tests:
         Log.INFO('\n\nTesting RE: ' + re_test['name'])
-        afd = AFD(re_test['re'], draw=False, print_tree=True)
+        afd = AFD(
+            re_test['re'].replace('a', ANY_BUT_QUOTES),
+            draw = False,
+            print_tree = True
+        )
 
         for test in re_test['tests']:
             result = afd.accepts(test['w'], characters)
@@ -262,5 +277,5 @@ def afd_test():
     else:
         Log.OKGREEN('\n\nTest passed')
 
-# afd_test()
+afd_test()
 lexical_generator()
