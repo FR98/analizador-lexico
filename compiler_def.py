@@ -57,21 +57,21 @@ KEYWORDS = {
 
 # TOKENS RE
 TOKENS_RE = {
-    'space': ' ',
+    'semantic_action': '«(.««««l¦d»¦s»¦o»¦ »±.»)',
+    'comment_block': '«/*««««l¦d»¦s»¦o»¦ »±*»/',
+    'comment': '//««««l¦d»¦s»¦o»¦ »±',
+    'string': '"««««l¦d»¦s»¦o»¦ »±"',
+    'char': '«\'«««l¦d»¦s»¦o»»\'',
+    'number': 'd«d»±',
+    'ident': 'l«l¦d»±',
+    'operator': 'o',
+    'iteration': '{¦}',
+    'option': '[¦]',
+    'group': '(¦)',
     'assign': '=',
     'final': '.',
     'or': '|',
-    'group': '(¦)',
-    'option': '[¦]',
-    'iteration': '{¦}',
-    'operator': 'o',
-    'ident': 'l«l¦d»±',
-    'number': 'd«d»±',
-    'string': '"««««l¦d»¦s»¦o»¦ »±"',
-    'char': '«\'«««l¦d»¦s»¦o»»\'',
-    'comment': '//««««l¦d»¦s»¦o»¦ »±',
-    'comment_block': '«/*««««l¦d»¦s»¦o»¦ »±*»/',
-    'semantic_action': '«(.««««l¦d»¦s»¦o»¦ »±.»)',
+    'space': ' ',
 }
 
 # -------------------------------------------------------
@@ -121,16 +121,15 @@ class CompilerDef():
         # Gramatica Regular
         line_index = 0
         while line_index < len(self.file_lines):
-            # words = line.replace('\n', '').split(' ')
-            # for word_index, word in enumerate(words):
-            #     self.tokens.append(Token(word, line_index, word_index))
             line = self.file_lines[line_index].replace('\n', '')
             analyzed_lines = self.eval_line(line, line_index)
             line_index += analyzed_lines
 
         Log.OKGREEN('\n\nTokens found:')
         for token in self.tokens:
-            if token.type != 'ERROR':
+            if token.type == 'ERROR':
+                Log.WARNING(token)
+            else:
                 Log.INFO(token)
     
     def eval_line(self, line, line_index):
@@ -145,6 +144,7 @@ class CompilerDef():
             while continuar:
                 if current_token and next_token:
                     if current_token.type != 'ERROR' and next_token.type == 'ERROR':
+                        avance -= 1
                         continuar = False
                         break
 
@@ -187,6 +187,7 @@ class CompilerDef():
         return analyzed_lines
 
     def has_lexical_errors(self):
+        Log.OKBLUE('\n\nLexical errors:')
         for token in self.tokens:
             if token.type == 'ERROR':
                 Log.WARNING(f'Lexical error on line {token.line} column {token.column}: {token.value}')
