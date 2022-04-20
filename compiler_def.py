@@ -243,7 +243,7 @@ class CompilerDef():
         self.TOKENS_RE = {
             'id': 'l«l¦d»±',
             'number': 'd«d»±',
-            'hexnumber': 'h«h»±H',
+            'hexnumber': 'h«h»±',
             'space': ' ',
         }
 
