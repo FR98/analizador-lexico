@@ -269,7 +269,7 @@ class LexGenerator:
         # Writing the lexical analyzer file
         # -------------------------------------------------------
         try:
-            lex_analyzer = open('output/lex-analyzer.py', 'w+')
+            lex_analyzer = open('lex-analyzer.py', 'w+')
 
             for line in self.FILE_LINES:
                 lex_analyzer.write(line)
@@ -287,7 +287,7 @@ class LexGenerator:
         try:
             Log.N('\n\n\n\n\n# -------------------------------------------------------')
             Log.N('\nRunning lexical analyzer...')
-            os.system('python3 output/lex-analyzer.py')
+            os.system('python3 lex-analyzer.py')
         except:
             Log.FAIL('\nThere was an error running the lexical analyzer.')
             exit()
