@@ -28,7 +28,7 @@ class Log:
 
     def FAIL(*attr):
         print(Log._RED, *attr, Log._END)
-    
+
     def N(*attr):
         print(*attr)
 

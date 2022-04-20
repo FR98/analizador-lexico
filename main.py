@@ -13,6 +13,7 @@ def lexical_generator():
 
 def afd_test():
     """
+    https://elcodigoascii.com.ar
     34 - "
     35 - #
     39 - '
@@ -22,12 +23,87 @@ def afd_test():
     63 - ?
     124 - |
     126 - ~
-    190 - º
+    174 - «
+    175 - »
+    221 - ¦
+    241 - ±
+    ¶¤§¨ª¬¯°²³´µ·¸¹º×
     """
 
     re_tests = [{
+        'name': 'space',
+        're': ' ',
+        'tests' : [{
+            'w': ' ',
+            'result': True
+        }]
+    }, {
+        'name': 'assign',
+        're': '=',
+        'tests' : [{
+            'w': '=',
+            'result': True
+        }]
+    }, {
+        'name': 'final',
+        're': '.',
+        'tests' : [{
+            'w': '.',
+            'result': True
+        }]
+    }, {
+        'name': 'or',
+        're': '|',
+        'tests' : [{
+            'w': '|',
+            'result': True
+        }]
+    }, {
+        'name': 'group',
+        're': '(¦)',
+        'tests' : [{
+            'w': '(',
+            'result': True
+        }, {
+            'w': ')',
+            'result': True
+        }]
+    }, {
+        'name': 'option',
+        're': '[¦]',
+        'tests' : [{
+            'w': '[',
+            'result': True
+        }, {
+            'w': ']',
+            'result': True
+        }]
+    }, {
+        'name': 'iteration',
+        're': '{¦}',
+        'tests' : [{
+            'w': '{',
+            'result': True
+        }, {
+            'w': '}',
+            'result': True
+        }]
+    }, {
+        'name': 'operator',
+        're': 'o',
+        'tests' : [{
+            'w': '+',
+            'result': True
+        }, {
+            'w': '-',
+            'result': True
+        }, {
+            'w': '+-',
+            'result': False
+        }]
+    }, {
         'name': 'ident',
-        're': 'l(l|d)*',
+        're': 'l«l¦d»±',
         'tests' : [{
             'w': 'var1',
             'result': True
@@ -40,7 +116,7 @@ def afd_test():
         }]
     }, {
         'name': 'number',
-        're': 'd(d)*',
+        're': 'd«d»±',
         'tests' : [{
             'w': '123',
             'result': True
@@ -53,69 +129,119 @@ def afd_test():
         }]
     }, {
         'name': 'string',
-        're': '"((l|d)|s)*"',
+        're': '"««««l¦d»¦s»¦o»¦ »±"',
         'tests' : [{
-            'w': '"string1)@"',
+            'w': '"string1@"',
             'result': True
         }, {
-            'w': '"string1)@',
+            'w': '"hola mundo"',
+            'result': True
+        }, {
+            'w': '"hola  mundo"',
+            'result': True
+        }, {
+            'w': '"string1@',
             'result': False
         }, {
-            'w': 'string1)@""',
+            'w': 'string1@""',
             'result': False
         }]
     }, {
         'name': 'char',
-        're': '\'((l|d)|s)*\'',
+        're': '«\'«««l¦d»¦s»¦o»»\'',
         'tests' : [{
-            'w': '\'string1)@\'',
+            'w': '\'2\'',
             'result': True
         }, {
-            'w': '\'string1)@',
+            'w': '\'a\'',
+            'result': True
+        }, {
+            'w': '\'@\'',
+            'result': True
+        }, {
+            'w': '\'string1@',
             'result': False
         }, {
-            'w': 'string1)@\'\'',
+            'w': 'string1@\'\'',
             'result': False
         }]
     }, {
         'name': 'comment',
-        're': '//((l|d)|s)*',
+        're': '//««««l¦d»¦s»¦o»¦ »±',
         'tests' : [{
-            'w': '//string1)@',
+            'w': '//string1@',
             'result': True
         }, {
-            'w': '/string1)@',
+            'w': '//hola mundo 1 @',
+            'result': True
+        }, {
+            'w': '/string1@',
             'result': False
         }, {
-            'w': 'str//ing1)@',
+            'w': 'str//ing1»@',
+            'result': False
+        }]
+    }, {
+        'name': 'comment_block',
+        're': '«/*««««l¦d»¦s»¦o»¦ »±*»/',
+        'tests' : [{
+            'w': '/*string1@*/',
+            'result': True
+        }, {
+            'w': '/*string 1 @ */',
+            'result': True
+        }, {
+            'w': '/*string1@',
+            'result': False
+        }, {
+            'w': 'str/**/ing1»@',
             'result': False
         }]
     }, {
         'name': 'semantic_action',
-        're': '(.((l|d)|s)*.)',
+        're': '«(.««««l¦d»¦s»¦o»¦ »±.»)',
         'tests' : [{
-            'w': '(.string1)@.)',
+            'w': '(.string1@.)',
             'result': True
         }, {
-            'w': '(.string1)@',
+            'w': '(.string1 @.)',
+            'result': True
+        }, {
+            'w': '.string1@.',
             'result': False
         }, {
-            'w': 'string1)@.)',
+            'w': '(.string1@',
+            'result': False
+        }, {
+            'w': 'string1@.)',
             'result': False
         }]
     }]
 
     characters = {
+        ' ': ' ',
         '"': '"',
         '\'': '\'',
         '/': '/',
+        '*': '*',
+        '=': '=',
         '.': '.',
-        's': '()@~!#$%^&*_+-=[]{}|;:,<>?',
+        '|': '|',
+        '(': '(',
+        ')': ')',
+        '[': '[',
+        ']': ']',
+        '{': '{',
+        '}': '}',
+        'o': '+-',
+        's': '@~!#$%^&_;:,<>?',
         'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
         'd': '0123456789',
     }
 
-    # Attributes are written between < and >. Semantic actions are enclosed in (. and .). The operators + and - are used to form character sets.
+    Log.INFO('Tokens RE')
+    for re_test in re_tests:
+        Log.N(f"'{re_test['name']}': '{re_test['re']}',")
 
     error_found = False
     for re_test in re_tests:
@@ -136,5 +262,5 @@ def afd_test():
     else:
         Log.OKGREEN('\n\nTest passed')
 
-# lexical_generator()
 afd_test()
+lexical_generator()
