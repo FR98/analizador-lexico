@@ -161,7 +161,7 @@ if lexical_errors:
 # WRITE TOKEN FLOW FILE
 # -------------------------------------------------------
 try:
-    tokens_flow_file = open('output/tokens-flow2', 'w+')
+    tokens_flow_file = open('output/tokens-flow', 'w+')
 
     for token in TOKENS:
         if token.type == 'KEYWORD':
