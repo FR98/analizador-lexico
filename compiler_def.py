@@ -202,7 +202,7 @@ class CompilerDef():
     def get_definitions(self):
         # Gramaticas libres de contexto
 
-        # TODO: Implementar analisis sintantico
+        # TODO: Implementar analisis sintantico (analisis de flujo de tokens)
 
         self.COMPILER_NAME = 'Ejemplo'
 
@@ -226,7 +226,7 @@ class CompilerDef():
 
         self.PRODUCTIONS = {}
 
-        # TODO: ---------------------------------------------------------------
+        # TODO: Convertir lo de arriba a lo de abajo ---------------------------------------------------------------
 
         self.COMPILER_NAME = 'Ejemplo'
 
@@ -253,6 +253,7 @@ class CompilerDef():
         self.PRODUCTIONS = {}
 
     def has_sintax_errors(self):
+        # TODO: validaciones sinantacticas
         # for token in self.tokens:
         #     if token.type == 'ERROR':
         #         self.sintax_errors = True
