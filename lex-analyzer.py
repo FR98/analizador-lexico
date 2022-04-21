@@ -21,6 +21,7 @@ CHARACTERS = {
 
 # KEYWORDS
 KEYWORDS = {
+    'EOF': '\\n',
     'if': 'if',
     'while': 'while',
 }
@@ -110,7 +111,7 @@ def eval_line(entry_file_lines, line, line_index):
             # se agrega la siguiente linea y se vuelve a intentar.
             if line_position == len(line) + 1 and len(current_line_recognized_tokens) == 0:
                 if line_index < len(entry_file_lines) - 1:
-                    new_line = line + ' ' + entry_file_lines[line_index + 1].replace('\n', '')
+                    new_line = line + ' ' + entry_file_lines[line_index + 1].replace('\n', '\\n')
                     line_index += 1
                     Log.INFO('Trying: ', new_line)
                     analyzed_lines += eval_line(entry_file_lines, new_line, line_index)
@@ -133,7 +134,7 @@ entry_file.close()
 # -------------------------------------------------------
 line_index = 0
 while line_index < len(entry_file_lines):
-    line = entry_file_lines[line_index].replace('\n', '')
+    line = entry_file_lines[line_index].replace('\n', '\\n')
     analyzed_lines = eval_line(entry_file_lines, line, line_index)
     line_index += analyzed_lines
 
@@ -165,8 +166,10 @@ try:
 
     for token in TOKENS:
         if token.type == 'KEYWORD':
-            tokens_flow_file.write(f'{token.value}')
-            # tokens_flow_file.write('\n')
+            if token.value == '\\n':
+                tokens_flow_file.write('\n')
+            else:
+               tokens_flow_file.write(f'{token.value}')
         elif token.type == 'space':
             tokens_flow_file.write(f'{token.value}')
         else:

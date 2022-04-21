@@ -55,6 +55,7 @@ KEYWORDS = {
     'IF': 'IF',
     'out': 'out',
     'TO': 'TO',
+    'EOF': '\\n',
 }
 
 # TOKENS RE
@@ -123,7 +124,7 @@ class CompilerDef():
         # Gramatica Regular
         line_index = 0
         while line_index < len(self.file_lines):
-            line = self.file_lines[line_index].replace('\n', '')
+            line = self.file_lines[line_index].replace('\n', '\\n')
             analyzed_lines = self.eval_line(line, line_index)
             line_index += analyzed_lines
 
@@ -181,7 +182,7 @@ class CompilerDef():
                 # se agrega la siguiente linea y se vuelve a intentar.
                 if line_position == len(line) + 1 and len(current_line_recognized_tokens) == 0:
                     if line_index < len(self.file_lines) - 1:
-                        new_line = line + ' ' + self.file_lines[line_index + 1].replace('\n', '')
+                        new_line = line.replace('\\n', ' ') + ' ' + self.file_lines[line_index + 1].replace('\n', '\\n')
                         line_index += 1
                         Log.INFO('Trying: ', new_line)
                         analyzed_lines += self.eval_line(new_line, line_index)
@@ -212,6 +213,7 @@ class CompilerDef():
         }
 
         self.KEYWORDS = {
+            'EOF': '\\\\n',
             'if': 'if',
             'while': 'while',
         }
@@ -224,7 +226,7 @@ class CompilerDef():
 
         self.PRODUCTIONS = {}
 
-        # ---------------------------------------------------------------
+        # TODO: ---------------------------------------------------------------
 
         self.COMPILER_NAME = 'Ejemplo'
 
@@ -236,6 +238,7 @@ class CompilerDef():
         }
 
         self.KEYWORDS = {
+            'EOF': '\\\\n',
             'if': 'if',
             'while': 'while',
         }
