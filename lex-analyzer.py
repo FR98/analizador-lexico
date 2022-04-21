@@ -21,7 +21,7 @@ CHARACTERS = {
 
 # KEYWORDS
 KEYWORDS = {
-    'EOF': '\\n',
+    'NEWLINE': '\\n',
     'if': 'if',
     'while': 'while',
 }

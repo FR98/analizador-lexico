@@ -55,7 +55,7 @@ KEYWORDS = {
     'IF': 'IF',
     'out': 'out',
     'TO': 'TO',
-    'EOF': '\\n',
+    'NEWLINE': '\\n',
 }
 
 # TOKENS RE
@@ -213,7 +213,7 @@ class CompilerDef():
         }
 
         self.KEYWORDS = {
-            'EOF': '\\\\n',
+            'NEWLINE': '\\\\n',
             'if': 'if',
             'while': 'while',
         }
@@ -238,7 +238,7 @@ class CompilerDef():
         }
 
         self.KEYWORDS = {
-            'EOF': '\\\\n',
+            'NEWLINE': '\\\\n',
             'if': 'if',
             'while': 'while',
         }
