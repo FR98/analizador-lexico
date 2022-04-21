@@ -165,12 +165,12 @@ try:
 
     for token in TOKENS:
         if token.type == 'KEYWORD':
-            tokens_flow_file.write(f'{token.value} ')
+            tokens_flow_file.write(f'{token.value}')
             # tokens_flow_file.write('\n')
         elif token.type == 'space':
-            pass
+            tokens_flow_file.write(f'{token.value}')
         else:
-            tokens_flow_file.write(f'{token.type} ')
+            tokens_flow_file.write(f'{token.type}')
 
     Log.OKGREEN('\nTokens flow file generated successfully.')
 except:
