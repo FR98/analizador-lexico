@@ -113,12 +113,18 @@ class CompilerDef():
         self.PRODUCTIONS = {}
         self.get_tokens()
         self.has_lexical_errors()
+
+        if self.lexical_errors:
+            Log.WARNING('\nPlease fix errors before continuing')
+            exit()
+
         self.get_definitions()
         self.has_sintax_errors()
 
-        if self.lexical_errors or self.sintax_errors:
+        if self.sintax_errors:
             Log.WARNING('\nPlease fix errors before continuing')
-            # exit()
+            exit()
+
 
     def get_tokens(self):
         # Gramatica Regular
@@ -197,12 +203,35 @@ class CompilerDef():
                 self.lexical_errors = True
 
         if self.lexical_errors:
-            Log.FAIL('\nLexical errors found on compiler definition file')
+            Log.FAIL('\tLexical errors found on compiler definition file')
+        else:
+            Log.OKGREEN('\tLexical errors not found')
 
     def get_definitions(self):
-        # Gramaticas libres de contexto
+        # Gramaticas libres de contexto - Analisis Sintactico
+        mandatory_characters = {
+            ' ': ' ',
+        }
 
-        # TODO: Implementar analisis sintantico (analisis de flujo de tokens)
+        mandatory_keywords = {
+            'NEWLINE': '\\n',
+        }
+
+        mandatory_tokens_re = {
+            'space': ' ',
+        }
+
+        # Analizar flujo de tokens
+        Log.OKBLUE('\n\nTokens flow:')
+        for token in self.tokens:
+            if token.value == '\\n':
+                print("Enter\n\n")
+            elif token.value == '.':
+                print("Punto\n\n")
+            elif token.type == 'KEYWORD':
+                print(token.value)
+            else:
+                print(token.type)
 
         self.COMPILER_NAME = 'Ejemplo'
 
