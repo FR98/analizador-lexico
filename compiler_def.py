@@ -77,6 +77,339 @@ TOKENS_RE = {
     'space': ' ',
 }
 
+# PRODUCTIONS
+PRODUCTIONS = {
+    'program': [
+        {
+            'type': 'KEYWORD',
+            'value': 'COMPILER',
+            'ocurrences': 1,
+        }, {
+            'type': 'ident',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'ScannerSpecification',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'ParserSpecification',
+            'ocurrences': 1,
+        }, {
+            'type': 'KEYWORD',
+            'value': 'END',
+            'ocurrences': 1,
+        }, {
+            'type': 'ident',
+            'ocurrences': 1,
+        }, {
+            'type': 'final',
+            'ocurrences': 1,
+        }
+    ],
+    'ScannerSpecification': [
+        {
+            'optional': True,
+            'type': 'PRODUCTION',
+            'value': 'CHARACTERS_SET',
+            'ocurrences': 1,
+        }, {
+            'optional': True,
+            'type': 'PRODUCTION',
+            'value': 'KEYWORDS_SET',
+            'ocurrences': 1,
+        }, {
+            'optional': True,
+            'type': 'PRODUCTION',
+            'value': 'TOKENS_SET',
+            'ocurrences': 1,
+        }
+    ],
+    'CHARACTERS_SET': [
+        {
+            'optional': True,
+            'type': 'KEYWORD',
+            'value': 'CHARACTERS',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'SetDecl',
+            'ocurrences': '+',
+        }
+    ],
+    'KEYWORDS_SET': [
+        {
+            'type': 'KEYWORD',
+            'value': 'KEYWORDS',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'KeyworDecl',
+            'ocurrences': '+',
+        }
+    ],
+    'TOKENS_SET': [
+        {
+            'type': 'KEYWORD',
+            'value': 'TOKENS',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenDecl',
+            'ocurrences': '+',
+        }
+    ],
+    'SetDecl': [
+        {
+            'type': 'ident',
+            'ocurrences': 1,
+        }, {
+            'type': 'assign',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'Set',
+            'ocurrences': 1,
+        }
+    ],
+    'Set': [
+        {
+            'type': 'PRODUCTION',
+            'value': 'BasicSet',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'BasicSetConvination',
+            'ocurrences': '+',
+        }
+    ],
+    'BasicSetConvination': [
+        {
+            'type': 'operator',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'BasicSet',
+            'ocurrences': 1,
+        }
+    ],
+    'BasicSet': [
+        {
+            'ocurrences': 1,
+            'options': [
+                {
+                    'type': 'string',
+                    'ocurrences': 1,
+                }, {
+                    'type': 'ident',
+                    'ocurrences': 1,
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'Char',
+                    'ocurrences': 1, # TODO: BasicSet = string | ident | Char [".." Char].
+                }
+            ]
+        }
+    ],
+    'Char': [
+        {
+            'ocurrences': 1,
+            'options': [
+                {
+                    'type': 'char',
+                    'ocurrences': 1,
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'CharCalculation',
+                    'ocurrences': 1,
+                }
+            ]
+        }
+    ],
+    'CharCalculation': [
+        {
+            'type': 'string',
+            'match': "CHR",
+            'ocurrences': 1,
+        }, {
+            'type': 'group',
+            'ocurrences': 1,
+        }, {
+            'type': 'number',
+            'ocurrences': 1,
+        }, {
+            'type': 'group',
+            'ocurrences': 1,
+        }
+    ],
+    'KeywordDecl': [
+        {
+            'type': 'ident',
+            'ocurrences': 1,
+        }, {
+            'type': 'assign',
+            'ocurrences': 1,
+        }, {
+            'type': 'string',
+            'ocurrences': 1,
+        }, {
+            'type': 'final',
+            'ocurrences': 1,
+        }
+    ],
+    'TokenDecl': [
+        {
+            'type': 'ident',
+            'ocurrences': 1,
+        }, {
+            'optional': True,
+            'type': 'PRODUCTION',
+            'value': 'AssignTokenExpr',
+            'ocurrences': 1,
+        }, {
+            'optional': True,
+            'type': 'string',
+            'match': 'EXCEPT KEYWORDS',
+            'ocurrences': 1,
+        }, {
+            'type': 'final',
+            'ocurrences': 1,
+        }
+    ],
+    'AssignTokenExpr': [
+        {
+            'type': 'assign',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenExpr',
+            'ocurrences': 1,
+        }
+    ],
+    'TokenExpr': [
+        {
+            'type': 'PRODUCTION',
+            'value': 'TokenTerm',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenExprConvination',
+            'ocurrences': '+',
+        }
+    ],
+    'TokenExprConvination': [
+        {
+            'type': 'or',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenTerm',
+            'ocurrences': 1,
+        }
+    ],
+    'TokenTerm': [
+        {
+            'type': 'PRODUCTION',
+            'value': 'TokenFactor',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenFactor',
+            'ocurrences': '+',
+        }
+    ],
+    'TokenFactor': [
+        {
+            'ocurrences': 1,
+            'options': [{
+                'type': 'PRODUCTION',
+                'value': 'Symbol',
+                'ocurrences': 1,
+            }, {
+                'type': 'PRODUCTION',
+                'value': 'TokenExprGroup',
+                'ocurrences': 1,
+            }, {
+                'type': 'PRODUCTION',
+                'value': 'TokenExprOption',
+                'ocurrences': 1,
+            }, {
+                'type': 'PRODUCTION',
+                'value': 'TokenExprIteration',
+                'ocurrences': 1,
+            }]
+        }
+    ],
+    'Symbol': [
+        {
+            'ocurrences': 1,
+            'options': [{
+                'type': 'ident',
+                'ocurrences': 1,
+            }, {
+                'type': 'string',
+                'ocurrences': 1,
+            }, {
+                'type': 'char',
+                'ocurrences': 1,
+            }]
+        }
+    ],
+    'TokenExprGroup': [
+        {
+            'type': 'group',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenExpr',
+            'ocurrences': 1,
+        }, {
+            'type': 'group',
+            'ocurrences': 1,
+        }
+    ],
+    'TokenExprOption': [
+        {
+            'type': 'option',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenExpr',
+            'ocurrences': 1,
+        }, {
+            'type': 'option',
+            'ocurrences': 1,
+        }
+    ],
+    'TokenExprIteration': [
+        {
+            'type': 'iteration',
+            'ocurrences': 1,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenExpr',
+            'ocurrences': 1,
+        }, {
+            'type': 'iteration',
+            'ocurrences': 1,
+        }
+    ],
+    'ParserSpecification': [
+        {
+            'type': 'string',
+            'match': '"PRODUCTIONS"',
+            'ocurrences': 1,
+        }
+    ],
+}
+# ParserSpecification = "PRODUCTIONS" {Production}.
+# Production = ident [Attributes] [SemAction] '=' Expression '.'.
+# Expression = Term{'|'Term}.
+# Term = Factor {Factor}
+# Factor = Symbol [Attributes] | '(' Expression ')' | '[' Expression ']' | '{' Expression '}' | SemAction.
+# Attributes = "<." {ANY} ".>"
+# SemAction = "(." {ANY} ".)"
+
 # -------------------------------------------------------
 
 class Token():
@@ -179,7 +512,7 @@ class CompilerDef():
                 self.tokens.append(current_token)
                 current_line_recognized_tokens.append(current_token)
             else:
-                Log.FAIL(current_token)
+                # Log.FAIL(current_token)
 
                 if line_position == len(line) + 1 and len(current_line_recognized_tokens) != 0:
                     self.tokens.append(current_token)
