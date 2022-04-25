@@ -83,54 +83,43 @@ PRODUCTIONS = {
         {
             'type': 'KEYWORD',
             'value': 'COMPILER',
-            'ocurrences': 1,
         }, {
             'type': 'ident',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'ScannerSpecification',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'ParserSpecification',
-            'ocurrences': 1,
         }, {
             'type': 'KEYWORD',
             'value': 'END',
-            'ocurrences': 1,
         }, {
             'type': 'ident',
-            'ocurrences': 1,
         }, {
             'type': 'final',
-            'ocurrences': 1,
         }
     ],
     'ScannerSpecification': [
         {
-            'optional': True,
             'type': 'PRODUCTION',
             'value': 'CHARACTERS_SET',
-            'ocurrences': 1,
-        }, {
             'optional': True,
+        }, {
             'type': 'PRODUCTION',
             'value': 'KEYWORDS_SET',
-            'ocurrences': 1,
-        }, {
             'optional': True,
+        }, {
             'type': 'PRODUCTION',
             'value': 'TOKENS_SET',
-            'ocurrences': 1,
+            'optional': True,
         }
     ],
     'CHARACTERS_SET': [
         {
-            'optional': True,
             'type': 'KEYWORD',
             'value': 'CHARACTERS',
-            'ocurrences': 1,
+            'optional': True,
         }, {
             'type': 'PRODUCTION',
             'value': 'SetDecl',
@@ -141,10 +130,9 @@ PRODUCTIONS = {
         {
             'type': 'KEYWORD',
             'value': 'KEYWORDS',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
-            'value': 'KeyworDecl',
+            'value': 'KeywordDecl',
             'ocurrences': '+',
         }
     ],
@@ -152,7 +140,6 @@ PRODUCTIONS = {
         {
             'type': 'KEYWORD',
             'value': 'TOKENS',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'TokenDecl',
@@ -162,21 +149,17 @@ PRODUCTIONS = {
     'SetDecl': [
         {
             'type': 'ident',
-            'ocurrences': 1,
         }, {
             'type': 'assign',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'Set',
-            'ocurrences': 1,
         }
     ],
     'Set': [
         {
             'type': 'PRODUCTION',
             'value': 'BasicSet',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'BasicSetConvination',
@@ -186,42 +169,35 @@ PRODUCTIONS = {
     'BasicSetConvination': [
         {
             'type': 'operator',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'BasicSet',
-            'ocurrences': 1,
         }
     ],
     'BasicSet': [
         {
-            'ocurrences': 1,
+            'type': 'OPTIONS',
             'options': [
                 {
                     'type': 'string',
-                    'ocurrences': 1,
                 }, {
                     'type': 'ident',
-                    'ocurrences': 1,
                 }, {
                     'type': 'PRODUCTION',
-                    'value': 'Char',
-                    'ocurrences': 1, # TODO: BasicSet = string | ident | Char [".." Char].
+                    'value': 'Char', # TODO: BasicSet = string | ident | Char [".." Char].
                 }
             ]
         }
     ],
     'Char': [
         {
-            'ocurrences': 1,
+            'type': 'OPTIONS',
             'options': [
                 {
                     'type': 'char',
-                    'ocurrences': 1,
                 }, {
                     'type': 'PRODUCTION',
                     'value': 'CharCalculation',
-                    'ocurrences': 1,
                 }
             ]
         }
@@ -230,67 +206,52 @@ PRODUCTIONS = {
         {
             'type': 'string',
             'match': "CHR",
-            'ocurrences': 1,
         }, {
             'type': 'group',
-            'ocurrences': 1,
         }, {
             'type': 'number',
-            'ocurrences': 1,
         }, {
             'type': 'group',
-            'ocurrences': 1,
         }
     ],
     'KeywordDecl': [
         {
             'type': 'ident',
-            'ocurrences': 1,
         }, {
             'type': 'assign',
-            'ocurrences': 1,
         }, {
             'type': 'string',
-            'ocurrences': 1,
         }, {
             'type': 'final',
-            'ocurrences': 1,
         }
     ],
     'TokenDecl': [
         {
             'type': 'ident',
-            'ocurrences': 1,
         }, {
-            'optional': True,
             'type': 'PRODUCTION',
             'value': 'AssignTokenExpr',
-            'ocurrences': 1,
-        }, {
             'optional': True,
+        }, {
             'type': 'string',
             'match': 'EXCEPT KEYWORDS',
-            'ocurrences': 1,
+            'optional': True,
         }, {
             'type': 'final',
-            'ocurrences': 1,
         }
     ],
     'AssignTokenExpr': [
         {
             'type': 'assign',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'TokenExpr',
-            'ocurrences': 1,
         }
     ],
     'TokenExpr': [
         {
             'type': 'PRODUCTION',
             'value': 'TokenTerm',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'TokenExprConvination',
@@ -300,18 +261,15 @@ PRODUCTIONS = {
     'TokenExprConvination': [
         {
             'type': 'or',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'TokenTerm',
-            'ocurrences': 1,
         }
     ],
     'TokenTerm': [
         {
             'type': 'PRODUCTION',
             'value': 'TokenFactor',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'TokenFactor',
@@ -320,85 +278,68 @@ PRODUCTIONS = {
     ],
     'TokenFactor': [
         {
-            'ocurrences': 1,
+            'type': 'OPTIONS',
             'options': [{
                 'type': 'PRODUCTION',
                 'value': 'Symbol',
-                'ocurrences': 1,
             }, {
                 'type': 'PRODUCTION',
                 'value': 'TokenExprGroup',
-                'ocurrences': 1,
             }, {
                 'type': 'PRODUCTION',
                 'value': 'TokenExprOption',
-                'ocurrences': 1,
             }, {
                 'type': 'PRODUCTION',
                 'value': 'TokenExprIteration',
-                'ocurrences': 1,
             }]
         }
     ],
     'Symbol': [
         {
-            'ocurrences': 1,
+            'type': 'OPTIONS',
             'options': [{
                 'type': 'ident',
-                'ocurrences': 1,
             }, {
                 'type': 'string',
-                'ocurrences': 1,
             }, {
                 'type': 'char',
-                'ocurrences': 1,
             }]
         }
     ],
     'TokenExprGroup': [
         {
             'type': 'group',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'TokenExpr',
-            'ocurrences': 1,
         }, {
             'type': 'group',
-            'ocurrences': 1,
         }
     ],
     'TokenExprOption': [
         {
             'type': 'option',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'TokenExpr',
-            'ocurrences': 1,
         }, {
             'type': 'option',
-            'ocurrences': 1,
         }
     ],
     'TokenExprIteration': [
         {
             'type': 'iteration',
-            'ocurrences': 1,
         }, {
             'type': 'PRODUCTION',
             'value': 'TokenExpr',
-            'ocurrences': 1,
         }, {
             'type': 'iteration',
-            'ocurrences': 1,
         }
     ],
     'ParserSpecification': [
         {
             'type': 'string',
             'match': '"PRODUCTIONS"',
-            'ocurrences': 1,
         }
     ],
 }
@@ -439,6 +380,7 @@ class CompilerDef():
         self.lexical_errors = False
         self.sintax_errors = False
         self.tokens = []
+        self.tokens_clean = []
         self.COMPILER_NAME = ''
         self.CHARACTERS = {}
         self.KEYWORDS = {}
@@ -473,7 +415,7 @@ class CompilerDef():
                 Log.WARNING(token)
             else:
                 Log.INFO(token)
-    
+
     def eval_line(self, line, line_index):
         analyzed_lines = 1
         line_position = 0
@@ -540,6 +482,15 @@ class CompilerDef():
         else:
             Log.OKGREEN('\tLexical errors not found')
 
+    def clean_tokens(self):
+        for token in self.tokens:
+            if token.type == 'space' or token.type == 'comment' or token.type == 'comment_block':
+                continue
+            elif token.type == 'KEYWORD' and token.value == '\\n':
+                continue
+            else:
+                self.tokens_clean.append(token)
+
     def get_definitions(self):
         # Gramaticas libres de contexto - Analisis Sintactico
         mandatory_characters = {
@@ -554,17 +505,18 @@ class CompilerDef():
             'space': ' ',
         }
 
+
+
         # Analizar flujo de tokens
-        Log.OKBLUE('\n\nTokens flow:')
-        for token in self.tokens:
-            if token.value == '\\n':
-                print("Enter\n\n")
-            elif token.value == '.':
-                print("Punto\n\n")
-            elif token.type == 'KEYWORD':
+        Log.OKBLUE('\n\nClean Tokens flow:')
+        self.clean_tokens()
+        for token in self.tokens_clean:
+            if token.type == 'KEYWORD':
                 print(token.value)
             else:
                 print(token.type)
+
+        self.eval_sintax(PRODUCTIONS['program'])
 
         self.COMPILER_NAME = 'Ejemplo'
 
@@ -613,6 +565,28 @@ class CompilerDef():
         }
 
         self.PRODUCTIONS = {}
+
+    def eval_sintax(self, productions, current_token_index = 0):
+        for sintax_token in productions:
+            if sintax_token['type'] == 'PRODUCTION':
+                self.eval_sintax(PRODUCTIONS[sintax_token['value']], current_token_index)
+            else:
+                if len(self.tokens_clean) > 0:
+                    current_token = self.tokens_clean[current_token_index]
+                    print(sintax_token, current_token)
+                    if sintax_token['type'] == 'KEYWORD':
+                        if sintax_token['type'] == current_token.type:
+                            if sintax_token['value'] == current_token.value:
+                                Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
+                                current_token_index += 1
+                    elif  sintax_token['type'] == 'OPTIONS':
+                        pass
+                    else:
+                        print("AVER", sintax_token['type'], current_token.type)
+                        if sintax_token['type'] == current_token.type:
+                            Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
+                            current_token_index += 1
+
 
     def has_sintax_errors(self):
         # TODO: validaciones sinantacticas
