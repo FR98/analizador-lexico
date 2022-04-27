@@ -284,9 +284,6 @@ PRODUCTIONS = {
             'options': [
                 {
                     'type': 'PRODUCTION',
-                    'value': 'Symbol',
-                }, {
-                    'type': 'PRODUCTION',
                     'value': 'TokenExprGroup',
                 }, {
                     'type': 'PRODUCTION',
@@ -294,6 +291,9 @@ PRODUCTIONS = {
                 }, {
                     'type': 'PRODUCTION',
                     'value': 'TokenExprIteration',
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'Symbol',
                 }
             ]
         }
@@ -527,19 +527,58 @@ class CompilerDef():
         # Analizar flujo de tokens
         Log.OKBLUE('\n\nClean Tokens flow:')
         self.clean_tokens()
-        for token in self.tokens_clean:
-            if token.type == 'KEYWORD':
-                print(token.value)
-            else:
-                print(token.type)
+        # for token in self.tokens_clean:
+        #     if token.type == 'KEYWORD':
+        #         print(token.value)
+        #     else:
+        #         print(token.type)
 
         current_token_index = self.eval_sintax(PRODUCTIONS['program'])
+
+        Log.INFO('\n\nSintax analysis: finished')
 
         if current_token_index != len(self.tokens_clean):
             Log.FAIL('\n\nSintax error on line ', self.tokens_clean[current_token_index].line, ' column ', self.tokens_clean[current_token_index].column, ': ', self.tokens_clean[current_token_index].value)
             self.sintax_errors = True
 
-        self.COMPILER_NAME = 'Ejemplo'
+        token_index = 0
+        while token_index < len(self.tokens_clean):
+            token = self.tokens_clean[token_index]
+            if token.type == 'KEYWORD':
+                if token.value == 'COMPILER':
+                    self.COMPILER_NAME = self.tokens_clean[token_index + 1].value
+                elif token.value == 'END':
+                    if self.COMPILER_NAME != self.tokens_clean[token_index + 1].value:
+                        self.sintax_errors = True
+                elif token.value == 'CHARACTERS':
+                    count = 0
+                    sub_character_tokens = []
+                    character_tokens = []
+                    while True:
+                        temp_token = self.tokens_clean[token_index + count + 1]
+
+                        if temp_token.type == 'final':
+                            character_tokens.append(sub_character_tokens)
+                            sub_character_tokens = []
+                        else:
+                            sub_character_tokens.append(temp_token.value)
+                        count += 1
+
+                        if temp_token.value in ['KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']:
+                            break
+                    token_index += count
+
+                    for sub_tokens in character_tokens:
+                        self.CHARACTERS[sub_tokens[0]] = ''.join(sub_tokens[2::])
+                elif token.value == 'KEYWORDS':
+                    print("add this to KEYWORDS")
+                elif token.value == 'TOKENS':
+                    print("add this to TOKENS")
+            token_index += 1
+
+        print('CHARACTERS: \n', self.CHARACTERS)
+        print('KEYWORDS: \n', self.KEYWORDS)
+        print('TOKENS_RE: \n', self.TOKENS_RE)
 
         self.CHARACTERS = {
             'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -559,11 +598,7 @@ class CompilerDef():
             'hexnumber': 'hexdigit {hexdigit} "(H)"',
         }
 
-        self.PRODUCTIONS = {}
-
         # TODO: Convertir lo de arriba a lo de abajo ---------------------------------------------------------------
-
-        self.COMPILER_NAME = 'Ejemplo'
 
         self.CHARACTERS = {
             ' ': ' ',
@@ -584,8 +619,6 @@ class CompilerDef():
             'hexnumber': 'h«h»±',
             'space': ' ',
         }
-
-        self.PRODUCTIONS = {}
 
     def eval_sintax(self, productions, current_token_index = 0):
         current_sintax_index = 0
@@ -644,6 +677,8 @@ class CompilerDef():
         elif sintax_token['type'] == 'PRODUCTION':
             return self.matches(PRODUCTIONS[sintax_token['value']][0], current_token)
         else:
+            print(sintax_token)
+            print("---------------------------------------", sintax_token['type'], current_token.type)
             if sintax_token['type'] == current_token.type:
                 Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
                 return True
@@ -652,6 +687,5 @@ class CompilerDef():
 
 
     def has_sintax_errors(self):
-        self.sintax_errors = True
         if self.sintax_errors:
             Log.FAIL('\nSintax errors found on compiler definition file')
