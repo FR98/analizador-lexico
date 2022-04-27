@@ -281,31 +281,35 @@ PRODUCTIONS = {
     'TokenFactor': [
         {
             'type': 'OPTIONS',
-            'options': [{
-                'type': 'PRODUCTION',
-                'value': 'Symbol',
-            }, {
-                'type': 'PRODUCTION',
-                'value': 'TokenExprGroup',
-            }, {
-                'type': 'PRODUCTION',
-                'value': 'TokenExprOption',
-            }, {
-                'type': 'PRODUCTION',
-                'value': 'TokenExprIteration',
-            }]
+            'options': [
+                {
+                    'type': 'PRODUCTION',
+                    'value': 'Symbol',
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'TokenExprGroup',
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'TokenExprOption',
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'TokenExprIteration',
+                }
+            ]
         }
     ],
     'Symbol': [
         {
             'type': 'OPTIONS',
-            'options': [{
-                'type': 'ident',
-            }, {
-                'type': 'string',
-            }, {
-                'type': 'char',
-            }]
+            'options': [
+                {
+                    'type': 'ident',
+                }, {
+                    'type': 'string',
+                }, {
+                    'type': 'char',
+                }
+            ]
         }
     ],
     'TokenExprGroup': [
@@ -634,11 +638,11 @@ class CompilerDef():
                 if sintax_token['value'] == current_token.value:
                     Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
                     return True
-        elif  sintax_token['type'] == 'OPTIONS':
+        elif sintax_token['type'] == 'OPTIONS':
             for option in sintax_token['options']:
-                if option['type'] == current_token.type:
-                    Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
-                    return True
+                return self.matches(option, current_token)
+        elif sintax_token['type'] == 'PRODUCTION':
+            return self.matches(PRODUCTIONS[sintax_token['value']][0], current_token)
         else:
             if sintax_token['type'] == current_token.type:
                 Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
