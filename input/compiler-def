@@ -6,9 +6,6 @@ COMPILER Ejemplo
     -- Comment --
 */
 
-(.
-/* -- Scanner Specification -- */
-.)
 
 CHARACTERS
 
@@ -23,10 +20,7 @@ while = "while".
 
 TOKENS
 
-id = letter {letter|digit} EXCEPT KEYWORDS.
-number = digit{digit}.
-hexnumber = hexdigit { hexdigit } "(H)".
 
 PRODUCTIONS
 
-END Ejemplo
+END Ejemplo.

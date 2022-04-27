@@ -77,6 +77,297 @@ TOKENS_RE = {
     'space': ' ',
 }
 
+# PRODUCTIONS
+PRODUCTIONS = {
+    'program': [
+        {
+            'type': 'KEYWORD',
+            'value': 'COMPILER',
+        }, {
+            'type': 'ident',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'ScannerSpecification',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'ParserSpecification',
+        }, {
+            'type': 'KEYWORD',
+            'value': 'END',
+        }, {
+            'type': 'ident',
+        }, {
+            'type': 'final',
+        }
+    ],
+    'ScannerSpecification': [
+        {
+            'type': 'PRODUCTION',
+            'value': 'CHARACTERS_SET',
+            'optional': True,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'KEYWORDS_SET',
+            'optional': True,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TOKENS_SET',
+            'optional': True,
+        }
+    ],
+    'CHARACTERS_SET': [
+        {
+            'type': 'KEYWORD',
+            'value': 'CHARACTERS',
+            'optional': True,
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'SetDecl',
+            'ocurrences': '+',
+        }
+    ],
+    'KEYWORDS_SET': [
+        {
+            'type': 'KEYWORD',
+            'value': 'KEYWORDS',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'KeywordDecl',
+            'ocurrences': '+',
+        }
+    ],
+    'TOKENS_SET': [
+        {
+            'type': 'KEYWORD',
+            'value': 'TOKENS',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenDecl',
+            'ocurrences': '+',
+        }
+    ],
+    'SetDecl': [
+        {
+            'type': 'ident',
+        }, {
+            'type': 'assign',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'Set',
+        }, {
+            'type': 'final',
+        }
+    ],
+    'Set': [
+        {
+            'type': 'PRODUCTION',
+            'value': 'BasicSet',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'BasicSetConvination',
+            'ocurrences': '+',
+        }
+    ],
+    'BasicSetConvination': [
+        {
+            'type': 'operator',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'BasicSet',
+        }
+    ],
+    'BasicSet': [
+        {
+            'type': 'OPTIONS',
+            'options': [
+                {
+                    'type': 'string',
+                }, {
+                    'type': 'ident',
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'Char', # TODO: BasicSet = string | ident | Char [".." Char].
+                }
+            ]
+        }
+    ],
+    'Char': [
+        {
+            'type': 'OPTIONS',
+            'options': [
+                {
+                    'type': 'char',
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'CharCalculation',
+                }
+            ]
+        }
+    ],
+    'CharCalculation': [
+        {
+            'type': 'string',
+            'match': "CHR",
+        }, {
+            'type': 'group',
+        }, {
+            'type': 'number',
+        }, {
+            'type': 'group',
+        }
+    ],
+    'KeywordDecl': [
+        {
+            'type': 'ident',
+        }, {
+            'type': 'assign',
+        }, {
+            'type': 'string',
+        }, {
+            'type': 'final',
+        }
+    ],
+    'TokenDecl': [
+        {
+            'type': 'ident',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'AssignTokenExpr',
+            'optional': True,
+        }, {
+            'type': 'string',
+            'match': 'EXCEPT KEYWORDS',
+            'optional': True,
+        }, {
+            'type': 'final',
+        }
+    ],
+    'AssignTokenExpr': [
+        {
+            'type': 'assign',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenExpr',
+        }
+    ],
+    'TokenExpr': [
+        {
+            'type': 'PRODUCTION',
+            'value': 'TokenTerm',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenExprConvination',
+            'ocurrences': '+',
+        }
+    ],
+    'TokenExprConvination': [
+        {
+            'type': 'or',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenTerm',
+        }
+    ],
+    'TokenTerm': [
+        {
+            'type': 'PRODUCTION',
+            'value': 'TokenFactor',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenFactor',
+            'ocurrences': '+',
+        }
+    ],
+    'TokenFactor': [
+        {
+            'type': 'OPTIONS',
+            'options': [
+                {
+                    'type': 'PRODUCTION',
+                    'value': 'TokenExprGroup',
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'TokenExprOption',
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'TokenExprIteration',
+                }, {
+                    'type': 'PRODUCTION',
+                    'value': 'Symbol',
+                }
+            ]
+        }
+    ],
+    'Symbol': [
+        {
+            'type': 'OPTIONS',
+            'options': [
+                {
+                    'type': 'ident',
+                }, {
+                    'type': 'string',
+                }, {
+                    'type': 'char',
+                }
+            ]
+        }
+    ],
+    'TokenExprGroup': [
+        {
+            'type': 'group',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenExpr',
+        }, {
+            'type': 'group',
+        }
+    ],
+    'TokenExprOption': [
+        {
+            'type': 'option',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenExpr',
+        }, {
+            'type': 'option',
+        }
+    ],
+    'TokenExprIteration': [
+        {
+            'type': 'iteration',
+        }, {
+            'type': 'PRODUCTION',
+            'value': 'TokenExpr',
+        }, {
+            'type': 'iteration',
+        }
+    ],
+    'ParserSpecification': [
+        {
+            'type': 'PRODUCTION',
+            'value': 'PRODUCTIONS_SET',
+            'optional': True,
+        },
+    ],
+    'PRODUCTIONS_SET': [
+        {
+            'type': 'KEYWORD',
+            'value': 'PRODUCTIONS',
+        # }, {
+        #     'type': 'PRODUCTION',
+        #     'value': 'ProdDecl',
+        #     'ocurrences': '+',
+        }
+    ],
+}
+# ParserSpecification = "PRODUCTIONS" {Production}.
+# Production = ident [Attributes] [SemAction] '=' Expression '.'.
+# Expression = Term{'|'Term}.
+# Term = Factor {Factor}
+# Factor = Symbol [Attributes] | '(' Expression ')' | '[' Expression ']' | '{' Expression '}' | SemAction.
+# Attributes = "<." {ANY} ".>"
+# SemAction = "(." {ANY} ".)"
+
 # -------------------------------------------------------
 
 class Token():
@@ -106,6 +397,7 @@ class CompilerDef():
         self.lexical_errors = False
         self.sintax_errors = False
         self.tokens = []
+        self.tokens_clean = []
         self.COMPILER_NAME = ''
         self.CHARACTERS = {}
         self.KEYWORDS = {}
@@ -113,12 +405,18 @@ class CompilerDef():
         self.PRODUCTIONS = {}
         self.get_tokens()
         self.has_lexical_errors()
+
+        if self.lexical_errors:
+            Log.WARNING('\nPlease fix errors before continuing')
+            exit()
+
         self.get_definitions()
         self.has_sintax_errors()
 
-        if self.lexical_errors or self.sintax_errors:
+        if self.sintax_errors:
             Log.WARNING('\nPlease fix errors before continuing')
-            # exit()
+            exit()
+
 
     def get_tokens(self):
         # Gramatica Regular
@@ -134,7 +432,7 @@ class CompilerDef():
                 Log.WARNING(token)
             else:
                 Log.INFO(token)
-    
+
     def eval_line(self, line, line_index):
         analyzed_lines = 1
         line_position = 0
@@ -173,7 +471,7 @@ class CompilerDef():
                 self.tokens.append(current_token)
                 current_line_recognized_tokens.append(current_token)
             else:
-                Log.FAIL(current_token)
+                # Log.FAIL(current_token)
 
                 if line_position == len(line) + 1 and len(current_line_recognized_tokens) != 0:
                     self.tokens.append(current_token)
@@ -197,14 +495,90 @@ class CompilerDef():
                 self.lexical_errors = True
 
         if self.lexical_errors:
-            Log.FAIL('\nLexical errors found on compiler definition file')
+            Log.FAIL('\tLexical errors found on compiler definition file')
+        else:
+            Log.OKGREEN('\tLexical errors not found')
+
+    def clean_tokens(self):
+        for token in self.tokens:
+            if token.type == 'space' or token.type == 'comment' or token.type == 'comment_block':
+                continue
+            elif token.type == 'KEYWORD' and token.value == '\\n':
+                continue
+            else:
+                self.tokens_clean.append(token)
 
     def get_definitions(self):
-        # Gramaticas libres de contexto
+        # Gramaticas libres de contexto - Analisis Sintactico
+        mandatory_characters = {
+            ' ': ' ',
+        }
 
-        # TODO: Implementar analisis sintantico (analisis de flujo de tokens)
+        mandatory_keywords = {
+            'NEWLINE': '\\n',
+        }
 
-        self.COMPILER_NAME = 'Ejemplo'
+        mandatory_tokens_re = {
+            'space': ' ',
+        }
+
+
+
+        # Analizar flujo de tokens
+        Log.OKBLUE('\n\nClean Tokens flow:')
+        self.clean_tokens()
+        # for token in self.tokens_clean:
+        #     if token.type == 'KEYWORD':
+        #         print(token.value)
+        #     else:
+        #         print(token.type)
+
+        current_token_index = self.eval_sintax(PRODUCTIONS['program'])
+
+        Log.INFO('\n\nSintax analysis: finished')
+
+        if current_token_index != len(self.tokens_clean):
+            Log.FAIL('\n\nSintax error on line ', self.tokens_clean[current_token_index].line, ' column ', self.tokens_clean[current_token_index].column, ': ', self.tokens_clean[current_token_index].value)
+            self.sintax_errors = True
+
+        token_index = 0
+        while token_index < len(self.tokens_clean):
+            token = self.tokens_clean[token_index]
+            if token.type == 'KEYWORD':
+                if token.value == 'COMPILER':
+                    self.COMPILER_NAME = self.tokens_clean[token_index + 1].value
+                elif token.value == 'END':
+                    if self.COMPILER_NAME != self.tokens_clean[token_index + 1].value:
+                        self.sintax_errors = True
+                elif token.value == 'CHARACTERS':
+                    count = 0
+                    sub_character_tokens = []
+                    character_tokens = []
+                    while True:
+                        temp_token = self.tokens_clean[token_index + count + 1]
+
+                        if temp_token.type == 'final':
+                            character_tokens.append(sub_character_tokens)
+                            sub_character_tokens = []
+                        else:
+                            sub_character_tokens.append(temp_token.value)
+                        count += 1
+
+                        if temp_token.value in ['KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']:
+                            break
+                    token_index += count
+
+                    for sub_tokens in character_tokens:
+                        self.CHARACTERS[sub_tokens[0]] = ''.join(sub_tokens[2::])
+                elif token.value == 'KEYWORDS':
+                    print("add this to KEYWORDS")
+                elif token.value == 'TOKENS':
+                    print("add this to TOKENS")
+            token_index += 1
+
+        print('CHARACTERS: \n', self.CHARACTERS)
+        print('KEYWORDS: \n', self.KEYWORDS)
+        print('TOKENS_RE: \n', self.TOKENS_RE)
 
         self.CHARACTERS = {
             'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -224,11 +598,7 @@ class CompilerDef():
             'hexnumber': 'hexdigit {hexdigit} "(H)"',
         }
 
-        self.PRODUCTIONS = {}
-
         # TODO: Convertir lo de arriba a lo de abajo ---------------------------------------------------------------
-
-        self.COMPILER_NAME = 'Ejemplo'
 
         self.CHARACTERS = {
             ' ': ' ',
@@ -250,13 +620,72 @@ class CompilerDef():
             'space': ' ',
         }
 
-        self.PRODUCTIONS = {}
+    def eval_sintax(self, productions, current_token_index = 0):
+        current_sintax_index = 0
+        while current_sintax_index < len(productions):
+            sintax_token = productions[current_sintax_index]
+            ocurrences = False
+            optional = False
+
+            if sintax_token.get('ocurrences') == '+':
+                # This means that the token could be 0 to n times repetead
+                ocurrences = True
+            
+            if sintax_token.get('optional'):
+                # This means that the token could be 0 times
+                optional = True
+
+            if sintax_token['type'] == 'PRODUCTION':
+                current_token_index = self.eval_sintax(PRODUCTIONS[sintax_token['value']], current_token_index)
+
+                if not ocurrences:
+                    current_sintax_index += 1
+                else:
+                    temp_current_token_index = self.eval_sintax(PRODUCTIONS[sintax_token['value']], current_token_index)
+
+                    if temp_current_token_index == current_token_index + len(PRODUCTIONS[sintax_token['value']]):
+                        current_token_index = temp_current_token_index
+                        current_sintax_index += 0
+                    else:
+                        current_sintax_index += 1
+
+            else:
+                if current_token_index < len(self.tokens_clean):
+                    current_token = self.tokens_clean[current_token_index]
+
+                    print("C", sintax_token['type'], current_token.type, current_token.value)
+                    matches = self.matches(sintax_token, current_token)
+
+                    if matches:
+                        current_token_index += 1
+                        current_sintax_index += 1
+                    else:
+                        # if optional:
+                        current_sintax_index += 1
+
+        return current_token_index
+
+    def matches(self, sintax_token, current_token):
+        if sintax_token['type'] == 'KEYWORD':
+            if sintax_token['type'] == current_token.type:
+                if sintax_token['value'] == current_token.value:
+                    Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
+                    return True
+        elif sintax_token['type'] == 'OPTIONS':
+            for option in sintax_token['options']:
+                return self.matches(option, current_token)
+        elif sintax_token['type'] == 'PRODUCTION':
+            return self.matches(PRODUCTIONS[sintax_token['value']][0], current_token)
+        else:
+            print(sintax_token)
+            print("---------------------------------------", sintax_token['type'], current_token.type)
+            if sintax_token['type'] == current_token.type:
+                Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
+                return True
+        
+        return False
+
 
     def has_sintax_errors(self):
-        # TODO: validaciones sinantacticas
-        # for token in self.tokens:
-        #     if token.type == 'ERROR':
-        #         self.sintax_errors = True
-
         if self.sintax_errors:
             Log.FAIL('\nSintax errors found on compiler definition file')
