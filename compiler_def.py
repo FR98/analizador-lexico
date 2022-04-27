@@ -340,12 +340,19 @@ PRODUCTIONS = {
     ],
     'ParserSpecification': [
         {
-        #     'type': 'string',
-        #     'match': '"PRODUCTIONS"',
-        # }, {
-            'type': 'KEYWORD',
-            'value': 'CHARACTERS',
+            'type': 'PRODUCTION',
+            'value': 'PRODUCTIONS_SET',
             'optional': True,
+        },
+    ],
+    'PRODUCTIONS_SET': [
+        {
+            'type': 'KEYWORD',
+            'value': 'PRODUCTIONS',
+        # }, {
+        #     'type': 'PRODUCTION',
+        #     'value': 'ProdDecl',
+        #     'ocurrences': '+',
         }
     ],
 }
@@ -594,29 +601,16 @@ class CompilerDef():
             if sintax_token['type'] == 'PRODUCTION':
                 current_token_index = self.eval_sintax(PRODUCTIONS[sintax_token['value']], current_token_index)
 
-                # if new_current_token_index == current_token_index + PRODUCTIONS[sintax_token['value']]:
-                #     current_token_index = new_current_token_index
+                if not ocurrences:
+                    current_sintax_index += 1
+                else:
+                    temp_current_token_index = self.eval_sintax(PRODUCTIONS[sintax_token['value']], current_token_index)
 
-                current_sintax_index += 1
-                # if not ocurrences:
-                #     current_sintax_index += 1
-                # else:
-                #     continuar = True
-                #     while continuar:
-                #         new_current_token_index = self.eval_sintax(PRODUCTIONS[sintax_token['value']], current_token_index)
-
-                #         if new_current_token_index == current_token_index + PRODUCTIONS[sintax_token['value']]:
-                #             current_token_index = new_current_token_index
-                #         else:
-                #             continuar = False
-
-                    # next_token = self.tokens_clean[current_token_index + 1]
-                    # print("N", sintax_token['type'], next_token.type, next_token.value)
-                    # print("N1", sintax_token)
-                    # matches = self.matches(sintax_token, next_token)
-
-                    # if matches:
-                    #     current_token_index += 1
+                    if temp_current_token_index == current_token_index + len(PRODUCTIONS[sintax_token['value']]):
+                        current_token_index = temp_current_token_index
+                        current_sintax_index += 0
+                    else:
+                        current_sintax_index += 1
 
             else:
                 if current_token_index < len(self.tokens_clean):
@@ -631,8 +625,6 @@ class CompilerDef():
                     else:
                         # if optional:
                         current_sintax_index += 1
-        
-                # current_sintax_index += 1
 
         return current_token_index
 
