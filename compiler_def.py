@@ -510,15 +510,16 @@ class CompilerDef():
 
     def get_definitions(self):
         # Gramaticas libres de contexto - Analisis Sintactico
-        mandatory_characters = {
+        # Adding Mandatory Tokens
+        self.CHARACTERS = {
             ' ': ' ',
         }
 
-        mandatory_keywords = {
+        self.KEYWORDS = {
             'NEWLINE': '\\n',
         }
 
-        mandatory_tokens_re = {
+        self.TOKENS_RE = {
             'space': ' ',
         }
 
@@ -561,17 +562,52 @@ class CompilerDef():
                             character_tokens.append(sub_character_tokens)
                             sub_character_tokens = []
                         else:
-                            sub_character_tokens.append(temp_token.value)
+                            sub_character_tokens.append(temp_token)
                         count += 1
 
                         if temp_token.value in ['KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']:
+                            token_index -= count
                             break
                     token_index += count
 
                     for sub_tokens in character_tokens:
-                        self.CHARACTERS[sub_tokens[0]] = ''.join(sub_tokens[2::])
+                        value = ''
+                        for token in sub_tokens[2::]:
+                            if token.type == 'ident':
+                                value += self.CHARACTERS[token.value]
+                            elif token.type == 'string':
+                                value += token.value.replace('"', '')
+
+                        self.CHARACTERS[sub_tokens[0].value] = value
+
                 elif token.value == 'KEYWORDS':
-                    print("add this to KEYWORDS")
+                    count = 0
+                    sub_keyword_tokens = []
+                    keyword_tokens = []
+                    while True:
+                        temp_token = self.tokens_clean[token_index + count + 1]
+
+                        if temp_token.type == 'final':
+                            keyword_tokens.append(sub_keyword_tokens)
+                            sub_keyword_tokens = []
+                        else:
+                            sub_keyword_tokens.append(temp_token)
+                        count += 1
+
+                        if temp_token.value in ['KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']:
+                            token_index -= count
+                            break
+                    token_index += count
+
+                    for sub_tokens in keyword_tokens:
+                        value = ''
+                        for token in sub_tokens[2::]:
+                            if token.type == 'ident':
+                                value += self.KEYWORDS[token.value]
+                            elif token.type == 'string':
+                                value += token.value.replace('"', '')
+
+                        self.KEYWORDS[sub_tokens[0].value] = value
                 elif token.value == 'TOKENS':
                     print("add this to TOKENS")
             token_index += 1
@@ -614,10 +650,10 @@ class CompilerDef():
         }
 
         self.TOKENS_RE = {
+            'space': ' ',
             'id': 'l«l¦d»±',
             'number': 'd«d»±',
             'hexnumber': 'h«h»±',
-            'space': ' ',
         }
 
     def eval_sintax(self, productions, current_token_index = 0):

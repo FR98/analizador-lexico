@@ -28,10 +28,10 @@ KEYWORDS = {
 
 # TOKENS RE
 TOKENS_RE = {
+    'space': ' ',
     'id': 'l«l¦d»±',
     'number': 'd«d»±',
     'hexnumber': 'h«h»±',
-    'space': ' ',
 }
 
 
