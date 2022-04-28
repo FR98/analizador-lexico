@@ -403,6 +403,7 @@ class CompilerDef():
         self.KEYWORDS = {}
         self.TOKENS_RE = {}
         self.PRODUCTIONS = {}
+        self.symbols = {}
         self.get_tokens()
         self.has_lexical_errors()
 
@@ -511,28 +512,18 @@ class CompilerDef():
     def get_definitions(self):
         # Gramaticas libres de contexto - Analisis Sintactico
         # Adding Mandatory Tokens
-        self.CHARACTERS = {
-            ' ': ' ',
-        }
+        self.CHARACTERS = {}
 
         self.KEYWORDS = {
-            'NEWLINE': '\\n',
+            'NEWLINE': '\\\\n',
         }
 
         self.TOKENS_RE = {
             'space': ' ',
         }
 
-
-
         # Analizar flujo de tokens
-        Log.OKBLUE('\n\nClean Tokens flow:')
         self.clean_tokens()
-        # for token in self.tokens_clean:
-        #     if token.type == 'KEYWORD':
-        #         print(token.value)
-        #     else:
-        #         print(token.type)
 
         current_token_index = self.eval_sintax(PRODUCTIONS['program'])
 
@@ -612,21 +603,8 @@ class CompilerDef():
                     print("add this to TOKENS")
             token_index += 1
 
-        print('CHARACTERS: \n', self.CHARACTERS)
-        print('KEYWORDS: \n', self.KEYWORDS)
+        print('ORIGINAL')
         print('TOKENS_RE: \n', self.TOKENS_RE)
-
-        self.CHARACTERS = {
-            'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-            'digit': '0123456789',
-            'hexdigit': '0123456789ABCDEF',
-        }
-
-        self.KEYWORDS = {
-            'NEWLINE': '\\\\n',
-            'if': 'if',
-            'while': 'while',
-        }
 
         self.TOKENS_RE = {
             'id': 'letter {letter|digit} EXCEPT KEYWORDS',
@@ -636,25 +614,19 @@ class CompilerDef():
 
         # TODO: Convertir lo de arriba a lo de abajo ---------------------------------------------------------------
 
-        self.CHARACTERS = {
-            ' ': ' ',
-            'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-            'd': '0123456789',
-            'h': '0123456789ABCDEF',
-        }
-
-        self.KEYWORDS = {
-            'NEWLINE': '\\\\n',
-            'if': 'if',
-            'while': 'while',
-        }
+        self.CHARACTERS = self.parse_CHARACTERS(self.CHARACTERS)
+        self.CHARACTERS[' '] = ' '
+        print(self.symbols)
 
         self.TOKENS_RE = {
             'space': ' ',
-            'id': 'l«l¦d»±',
-            'number': 'd«d»±',
-            'hexnumber': 'h«h»±',
+            'id': 'A«A¦B»±',
+            'number': 'B«B»±',
+            'hexnumber': 'C«C»±',
         }
+
+        print('PARSED')
+        print('TOKENS_RE: \n', self.TOKENS_RE)
 
     def eval_sintax(self, productions, current_token_index = 0):
         current_sintax_index = 0
@@ -666,7 +638,7 @@ class CompilerDef():
             if sintax_token.get('ocurrences') == '+':
                 # This means that the token could be 0 to n times repetead
                 ocurrences = True
-            
+
             if sintax_token.get('optional'):
                 # This means that the token could be 0 times
                 optional = True
@@ -718,8 +690,19 @@ class CompilerDef():
             if sintax_token['type'] == current_token.type:
                 Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
                 return True
-        
+
         return False
+
+    def parse_CHARACTERS(self, CHARACTERS):
+        cont = 65
+        keys = list(CHARACTERS.keys())
+        for i in range(len(CHARACTERS)):
+            # self.symbols[chr(cont)] = keys[i]
+            self.symbols[keys[i]] = chr(cont)
+            CHARACTERS[chr(cont)] = CHARACTERS.pop(keys[i])
+            cont += 1
+
+        return CHARACTERS
 
 
     def has_sintax_errors(self):

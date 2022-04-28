@@ -13,10 +13,10 @@ ANY_BUT_QUOTES = '«««««««««««««««l¦d»¦s»¦o»¦ »¦(»¦)»�
 
 # CHARACTERS
 CHARACTERS = {
+    'A': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    'B': '0123456789',
+    'C': '0123456789ABCDEF',
     ' ': ' ',
-    'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    'd': '0123456789',
-    'h': '0123456789ABCDEF',
 }
 
 # KEYWORDS
@@ -29,9 +29,9 @@ KEYWORDS = {
 # TOKENS RE
 TOKENS_RE = {
     'space': ' ',
-    'id': 'l«l¦d»±',
-    'number': 'd«d»±',
-    'hexnumber': 'h«h»±',
+    'id': 'A«A¦B»±',
+    'number': 'B«B»±',
+    'hexnumber': 'C«C»±',
 }
 
 
