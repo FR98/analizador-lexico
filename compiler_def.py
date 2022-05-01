@@ -404,6 +404,7 @@ class CompilerDef():
         self.TOKENS_RE = {}
         self.PRODUCTIONS = {}
         self.symbols = {}
+        self.checking_tokens = False
 
         self.get_tokens()
         self.has_lexical_errors()
@@ -690,8 +691,18 @@ class CompilerDef():
                 if current_token_index < len(self.tokens_clean):
                     current_token = self.tokens_clean[current_token_index]
 
-                    print("C", sintax_token['type'], current_token.type, current_token.value)
-                    matches = self.matches(sintax_token, current_token)
+                    if current_token.value == 'TOKENS':
+                        self.checking_tokens = True
+
+                    if self.checking_tokens:
+                        if current_token.value in ['PRODUCTIONS', 'END']:
+                            self.checking_tokens = False
+
+                    if self.checking_tokens:
+                        matches = True
+                    else:
+                        # TODO: print("C", sintax_token['type'], current_token.type, current_token.value)
+                        matches = self.matches(sintax_token, current_token)
 
                     if matches:
                         current_token_index += 1
@@ -715,8 +726,8 @@ class CompilerDef():
         elif sintax_token['type'] == 'PRODUCTION':
             return self.matches(PRODUCTIONS[sintax_token['value']][0], current_token)
         else:
-            print(sintax_token)
-            print("---------------------------------------", sintax_token['type'], current_token.type)
+            # TODO: print(sintax_token)
+            # TODO: print("---------------------------------------", sintax_token['type'], current_token.type)
             if sintax_token['type'] == current_token.type:
                 Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
                 return True
