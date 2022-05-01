@@ -403,6 +403,7 @@ class CompilerDef():
         self.KEYWORDS = {}
         self.TOKENS_RE = {}
         self.PRODUCTIONS = {}
+        self.symbols = {}
         self.get_tokens()
         self.has_lexical_errors()
 
@@ -510,28 +511,17 @@ class CompilerDef():
 
     def get_definitions(self):
         # Gramaticas libres de contexto - Analisis Sintactico
-        mandatory_characters = {
-            ' ': ' ',
+        # Adding Mandatory Tokens
+        self.CHARACTERS = {}
+
+        self.KEYWORDS = {
+            'NEWLINE': '\\\\n',
         }
 
-        mandatory_keywords = {
-            'NEWLINE': '\\n',
-        }
-
-        mandatory_tokens_re = {
-            'space': ' ',
-        }
-
-
+        self.TOKENS_RE = {}
 
         # Analizar flujo de tokens
-        Log.OKBLUE('\n\nClean Tokens flow:')
         self.clean_tokens()
-        # for token in self.tokens_clean:
-        #     if token.type == 'KEYWORD':
-        #         print(token.value)
-        #     else:
-        #         print(token.type)
 
         current_token_index = self.eval_sintax(PRODUCTIONS['program'])
 
@@ -539,86 +529,117 @@ class CompilerDef():
 
         if current_token_index != len(self.tokens_clean):
             Log.FAIL('\n\nSintax error on line ', self.tokens_clean[current_token_index].line, ' column ', self.tokens_clean[current_token_index].column, ': ', self.tokens_clean[current_token_index].value)
-            self.sintax_errors = True
+            # self.sintax_errors = True
 
         token_index = 0
         while token_index < len(self.tokens_clean):
             token = self.tokens_clean[token_index]
             if token.type == 'KEYWORD':
                 if token.value == 'COMPILER':
+                    # Get Compiler Name
                     self.COMPILER_NAME = self.tokens_clean[token_index + 1].value
                 elif token.value == 'END':
+                    # Validate Compiler Name
                     if self.COMPILER_NAME != self.tokens_clean[token_index + 1].value:
                         self.sintax_errors = True
                 elif token.value == 'CHARACTERS':
+                    # Get Characters
                     count = 0
-                    sub_character_tokens = []
-                    character_tokens = []
+                    character_definition_tokens = []
+                    character_section_definitions = []
+                    while True:
+                        # Iterate until end of characters section tokens
+                        temp_token = self.tokens_clean[token_index + count + 1]
+
+                        if temp_token.type == 'final':
+                            # If final token is reached, means that the characters definition is finished
+                            character_section_definitions.append(character_definition_tokens)
+                            character_definition_tokens = []
+                        else:
+                            character_definition_tokens.append(temp_token)
+                        count += 1
+
+                        if temp_token.value in ['KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']:
+                            token_index -= count
+                            break
+                    token_index += count
+
+                    for definition_tokens in character_section_definitions:
+                        value = ''
+                        for token in definition_tokens[2::]:
+                            if token.type == 'ident':
+                                value += self.CHARACTERS[token.value]
+                            elif token.type == 'string':
+                                value += token.value.replace('"', '')
+
+                        self.CHARACTERS[definition_tokens[0].value] = value
+
+                elif token.value == 'KEYWORDS' and self.tokens_clean[token_index + 1].type != 'final':
+                    count = 0
+                    keyword_definition_tokens = []
+                    keyword_section_definitions = []
                     while True:
                         temp_token = self.tokens_clean[token_index + count + 1]
 
                         if temp_token.type == 'final':
-                            character_tokens.append(sub_character_tokens)
-                            sub_character_tokens = []
+                            keyword_section_definitions.append(keyword_definition_tokens)
+                            keyword_definition_tokens = []
                         else:
-                            sub_character_tokens.append(temp_token.value)
+                            keyword_definition_tokens.append(temp_token)
                         count += 1
 
                         if temp_token.value in ['KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']:
+                            token_index -= count
                             break
                     token_index += count
 
-                    for sub_tokens in character_tokens:
-                        self.CHARACTERS[sub_tokens[0]] = ''.join(sub_tokens[2::])
-                elif token.value == 'KEYWORDS':
-                    print("add this to KEYWORDS")
+                    for definition_tokens in keyword_section_definitions:
+                        value = ''
+                        for token in definition_tokens[2::]:
+                            # if token.type == 'ident':
+                            #     value += self.KEYWORDS[token.value]
+                            if token.type == 'string':
+                                value += token.value.replace('"', '')
+
+                        self.KEYWORDS[definition_tokens[0].value] = value
                 elif token.value == 'TOKENS':
-                    print("add this to TOKENS")
+                    count = 0
+                    token_re_definition_tokens = []
+                    token_re_section_definitions = []
+                    while True:
+                        temp_token = self.tokens_clean[token_index + count + 1]
+
+                        if temp_token.type == 'final':
+                            token_re_section_definitions.append(token_re_definition_tokens)
+                            token_re_definition_tokens = []
+                        else:
+                            token_re_definition_tokens.append(temp_token)
+                        count += 1
+
+                        if temp_token.value in ['TOKENS', 'PRODUCTIONS', 'END']:
+                            token_index -= count
+                            break
+                    token_index += count
+
+                    for definition_tokens in token_re_section_definitions:
+                        value = []
+                        for token in definition_tokens[2::]:
+                            if token.type == 'ident':
+                                if token.value not in ['EXCEPT', 'KEYWORDS']:
+                                    value.append(token)
+                            elif token.type == 'string':
+                                value.append(token)
+                            elif token.type in ['iteration', 'option', 'group', 'or']:
+                                value.append(token)
+
+                        self.TOKENS_RE[definition_tokens[0].value] = value
             token_index += 1
 
-        print('CHARACTERS: \n', self.CHARACTERS)
-        print('KEYWORDS: \n', self.KEYWORDS)
-        print('TOKENS_RE: \n', self.TOKENS_RE)
+        self.CHARACTERS = self.parse_CHARACTERS(self.CHARACTERS)
+        self.CHARACTERS[' '] = ' '
 
-        self.CHARACTERS = {
-            'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-            'digit': '0123456789',
-            'hexdigit': '0123456789ABCDEF',
-        }
-
-        self.KEYWORDS = {
-            'NEWLINE': '\\\\n',
-            'if': 'if',
-            'while': 'while',
-        }
-
-        self.TOKENS_RE = {
-            'id': 'letter {letter|digit} EXCEPT KEYWORDS',
-            'number': 'digit{digit}',
-            'hexnumber': 'hexdigit {hexdigit} "(H)"',
-        }
-
-        # TODO: Convertir lo de arriba a lo de abajo ---------------------------------------------------------------
-
-        self.CHARACTERS = {
-            ' ': ' ',
-            'l': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-            'd': '0123456789',
-            'h': '0123456789ABCDEF',
-        }
-
-        self.KEYWORDS = {
-            'NEWLINE': '\\\\n',
-            'if': 'if',
-            'while': 'while',
-        }
-
-        self.TOKENS_RE = {
-            'id': 'l«l¦d»±',
-            'number': 'd«d»±',
-            'hexnumber': 'h«h»±',
-            'space': ' ',
-        }
+        self.TOKENS_RE = self.parse_TOKENS_RE(self.TOKENS_RE)
+        self.TOKENS_RE['space'] = ' '
 
     def eval_sintax(self, productions, current_token_index = 0):
         current_sintax_index = 0
@@ -630,7 +651,7 @@ class CompilerDef():
             if sintax_token.get('ocurrences') == '+':
                 # This means that the token could be 0 to n times repetead
                 ocurrences = True
-            
+
             if sintax_token.get('optional'):
                 # This means that the token could be 0 times
                 optional = True
@@ -682,9 +703,61 @@ class CompilerDef():
             if sintax_token['type'] == current_token.type:
                 Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
                 return True
-        
+
         return False
 
+    def parse_CHARACTERS(self, CHARACTERS):
+        cont = 65
+        keys = list(CHARACTERS.keys())
+        for i in range(len(CHARACTERS)):
+            # self.symbols[chr(cont)] = keys[i]
+            self.symbols[keys[i]] = chr(cont)
+            CHARACTERS[chr(cont)] = CHARACTERS.pop(keys[i])
+            cont += 1
+
+        return CHARACTERS
+
+    def parse_TOKENS_RE(self, TOKENS_RE):
+        # 'letter {letter|digit} EXCEPT KEYWORDS' ---> 'A«A¦B»±'
+
+        for key, val in TOKENS_RE.items():
+            value = ''
+            for token in val:
+                if token.value in self.symbols:
+                    value += self.symbols[token.value]
+                else:
+                    if token.type in ['iteration', 'option', 'group', 'or']:
+                        value += token.value
+                    else:
+                        # TODO: Add support for strings
+                        # value += token.value
+                        print(token)
+
+            TOKENS_RE[key] = self.changeExp(value)
+
+        return TOKENS_RE
+
+    def changeExp(self, re):
+        cont = 0
+        closeK = []
+        for pos, char in enumerate(re):
+            if char == '{':
+                cont += 1
+            elif char == '}':
+                closeK.append(pos)
+                cont -= 1
+
+        if cont != 0:
+            return False
+
+        re = re.replace('{', '«')
+        re = re.replace('}', '»')
+        re = re.replace('|', '¦')
+
+        for i in range(len(closeK)):
+            re = re[:closeK[i]+1+i] + '±' + re[closeK[i]+1+i:]
+
+        return re
 
     def has_sintax_errors(self):
         if self.sintax_errors:

@@ -278,4 +278,8 @@ def afd_test():
         Log.OKGREEN('\n\nTest passed')
 
 afd_test()
-lexical_generator()
+
+try:
+    lexical_generator()
+except Exception as e:
+    Log.FAIL('\nUnable to generate lexical analyzer', e)
