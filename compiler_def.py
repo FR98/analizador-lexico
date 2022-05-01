@@ -518,9 +518,7 @@ class CompilerDef():
             'NEWLINE': '\\\\n',
         }
 
-        self.TOKENS_RE = {
-            'space': ' ',
-        }
+        self.TOKENS_RE = {}
 
         # Analizar flujo de tokens
         self.clean_tokens()
@@ -531,29 +529,34 @@ class CompilerDef():
 
         if current_token_index != len(self.tokens_clean):
             Log.FAIL('\n\nSintax error on line ', self.tokens_clean[current_token_index].line, ' column ', self.tokens_clean[current_token_index].column, ': ', self.tokens_clean[current_token_index].value)
-            self.sintax_errors = True
+            # self.sintax_errors = True
 
         token_index = 0
         while token_index < len(self.tokens_clean):
             token = self.tokens_clean[token_index]
             if token.type == 'KEYWORD':
                 if token.value == 'COMPILER':
+                    # Get Compiler Name
                     self.COMPILER_NAME = self.tokens_clean[token_index + 1].value
                 elif token.value == 'END':
+                    # Validate Compiler Name
                     if self.COMPILER_NAME != self.tokens_clean[token_index + 1].value:
                         self.sintax_errors = True
                 elif token.value == 'CHARACTERS':
+                    # Get Characters
                     count = 0
-                    sub_character_tokens = []
-                    character_tokens = []
+                    character_definition_tokens = []
+                    character_section_definitions = []
                     while True:
+                        # Iterate until end of characters section tokens
                         temp_token = self.tokens_clean[token_index + count + 1]
 
                         if temp_token.type == 'final':
-                            character_tokens.append(sub_character_tokens)
-                            sub_character_tokens = []
+                            # If final token is reached, means that the characters definition is finished
+                            character_section_definitions.append(character_definition_tokens)
+                            character_definition_tokens = []
                         else:
-                            sub_character_tokens.append(temp_token)
+                            character_definition_tokens.append(temp_token)
                         count += 1
 
                         if temp_token.value in ['KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']:
@@ -561,28 +564,28 @@ class CompilerDef():
                             break
                     token_index += count
 
-                    for sub_tokens in character_tokens:
+                    for definition_tokens in character_section_definitions:
                         value = ''
-                        for token in sub_tokens[2::]:
+                        for token in definition_tokens[2::]:
                             if token.type == 'ident':
                                 value += self.CHARACTERS[token.value]
                             elif token.type == 'string':
                                 value += token.value.replace('"', '')
 
-                        self.CHARACTERS[sub_tokens[0].value] = value
+                        self.CHARACTERS[definition_tokens[0].value] = value
 
-                elif token.value == 'KEYWORDS':
+                elif token.value == 'KEYWORDS' and self.tokens_clean[token_index + 1].type != 'final':
                     count = 0
-                    sub_keyword_tokens = []
-                    keyword_tokens = []
+                    keyword_definition_tokens = []
+                    keyword_section_definitions = []
                     while True:
                         temp_token = self.tokens_clean[token_index + count + 1]
 
                         if temp_token.type == 'final':
-                            keyword_tokens.append(sub_keyword_tokens)
-                            sub_keyword_tokens = []
+                            keyword_section_definitions.append(keyword_definition_tokens)
+                            keyword_definition_tokens = []
                         else:
-                            sub_keyword_tokens.append(temp_token)
+                            keyword_definition_tokens.append(temp_token)
                         count += 1
 
                         if temp_token.value in ['KEYWORDS', 'TOKENS', 'PRODUCTIONS', 'END']:
@@ -590,42 +593,65 @@ class CompilerDef():
                             break
                     token_index += count
 
-                    for sub_tokens in keyword_tokens:
+                    for definition_tokens in keyword_section_definitions:
                         value = ''
-                        for token in sub_tokens[2::]:
-                            if token.type == 'ident':
-                                value += self.KEYWORDS[token.value]
-                            elif token.type == 'string':
+                        for token in definition_tokens[2::]:
+                            # if token.type == 'ident':
+                            #     value += self.KEYWORDS[token.value]
+                            if token.type == 'string':
                                 value += token.value.replace('"', '')
 
-                        self.KEYWORDS[sub_tokens[0].value] = value
+                        self.KEYWORDS[definition_tokens[0].value] = value
                 elif token.value == 'TOKENS':
-                    print("add this to TOKENS")
+                    count = 0
+                    token_re_definition_tokens = []
+                    token_re_section_definitions = []
+                    while True:
+                        temp_token = self.tokens_clean[token_index + count + 1]
+
+                        if temp_token.type == 'final':
+                            token_re_section_definitions.append(token_re_definition_tokens)
+                            token_re_definition_tokens = []
+                        else:
+                            token_re_definition_tokens.append(temp_token)
+                        count += 1
+
+                        if temp_token.value in ['TOKENS', 'PRODUCTIONS', 'END']:
+                            token_index -= count
+                            break
+                    token_index += count
+
+                    for definition_tokens in token_re_section_definitions:
+                        value = []
+                        for token in definition_tokens[2::]:
+                            if token.type == 'ident':
+                                if token.value not in ['EXCEPT', 'KEYWORDS']:
+                                    value.append(token.value)
+                            elif token.type == 'string':
+                                value.append(token.value.replace('"', ''))
+                            elif token.type in ['iteration', 'option', 'group', 'or']:
+                                value.append(token.value)
+
+                        self.TOKENS_RE[definition_tokens[0].value] = value
             token_index += 1
-
-        print('ORIGINAL')
-        print('TOKENS_RE: \n', self.TOKENS_RE)
-
-        self.TOKENS_RE = {
-            'id': 'letter {letter|digit} EXCEPT KEYWORDS',
-            'number': 'digit{digit}',
-            'hexnumber': 'hexdigit {hexdigit} "(H)"',
-        }
-
-        # TODO: Convertir lo de arriba a lo de abajo ---------------------------------------------------------------
 
         self.CHARACTERS = self.parse_CHARACTERS(self.CHARACTERS)
         self.CHARACTERS[' '] = ' '
-        print(self.symbols)
+
+        self.TOKENS_RE = self.parse_TOKENS_RE(self.TOKENS_RE)
+        self.TOKENS_RE['space'] = ' '
+
+        print('\n\nORIGINAL')
+        print('TOKENS_RE: \n', self.TOKENS_RE)
 
         self.TOKENS_RE = {
-            'space': ' ',
             'id': 'A«A¦B»±',
             'number': 'B«B»±',
             'hexnumber': 'C«C»±',
+            'space': ' ',
         }
 
-        print('PARSED')
+        print('\n\nPARSED')
         print('TOKENS_RE: \n', self.TOKENS_RE)
 
     def eval_sintax(self, productions, current_token_index = 0):
@@ -704,6 +730,41 @@ class CompilerDef():
 
         return CHARACTERS
 
+    def parse_TOKENS_RE(self, TOKENS_RE):
+        # 'letter {letter|digit} EXCEPT KEYWORDS' ---> 'A«A¦B»±'
+
+        for key, val in TOKENS_RE.items():
+            value = ''
+            for token in val:
+                if token in self.symbols:
+                    value += self.symbols[token]
+                else:
+                    value += token
+
+            TOKENS_RE[key] = self.changeExp(value)
+
+        return TOKENS_RE
+
+    def changeExp(self, re):
+        cont = 0
+        closeK = []
+        for pos, char in enumerate(re):
+            if char == '{':
+                cont += 1
+            elif char == '}':
+                closeK.append(pos)
+                cont -= 1
+
+        if cont != 0:
+            return False
+
+        re = re.replace('{', '«')
+        re = re.replace('}', '»')
+
+        for i in range(len(closeK)):
+            re = re[:closeK[i]+1+i] + '±' + re[closeK[i]+1+i:]
+
+        return re
 
     def has_sintax_errors(self):
         if self.sintax_errors:
