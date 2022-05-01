@@ -404,20 +404,15 @@ class CompilerDef():
         self.TOKENS_RE = {}
         self.PRODUCTIONS = {}
         self.symbols = {}
+
         self.get_tokens()
         self.has_lexical_errors()
 
-        if self.lexical_errors:
-            Log.WARNING('\nPlease fix errors before continuing')
-            exit()
+        self.check_sintax()
+        self.has_sintax_errors()
 
         self.get_definitions()
         self.has_sintax_errors()
-
-        if self.sintax_errors:
-            Log.WARNING('\nPlease fix errors before continuing')
-            exit()
-
 
     def get_tokens(self):
         # Gramatica Regular
@@ -511,8 +506,8 @@ class CompilerDef():
 
         if self.lexical_errors:
             Log.FAIL('\tLexical errors found on compiler definition file')
-        else:
-            Log.OKGREEN('\tLexical errors not found')
+            Log.WARNING('\nPlease fix errors before continuing')
+            exit()
 
     def clean_tokens(self):
         for token in self.tokens:
@@ -522,6 +517,19 @@ class CompilerDef():
                 continue
             else:
                 self.tokens_clean.append(token)
+
+    def check_sintax(self):
+        # Analizar flujo de tokens
+        self.clean_tokens()
+
+        current_token_index = self.eval_sintax(PRODUCTIONS['program'])
+
+        Log.INFO('\n\nSintax analysis: finished')
+
+        if current_token_index != len(self.tokens_clean):
+            Log.FAIL('\n\nSintax error on line ', self.tokens_clean[current_token_index].line, ' column ', self.tokens_clean[current_token_index].column, ': ', self.tokens_clean[current_token_index].value)
+            self.sintax_errors = True
+
 
     def get_definitions(self):
         # Gramaticas libres de contexto - Analisis Sintactico
@@ -534,17 +542,6 @@ class CompilerDef():
 
         self.TOKENS_RE = {}
 
-        # Analizar flujo de tokens
-        # --------------------------------------------------
-        self.clean_tokens()
-
-        current_token_index = self.eval_sintax(PRODUCTIONS['program'])
-
-        Log.INFO('\n\nSintax analysis: finished')
-
-        if current_token_index != len(self.tokens_clean):
-            Log.FAIL('\n\nSintax error on line ', self.tokens_clean[current_token_index].line, ' column ', self.tokens_clean[current_token_index].column, ': ', self.tokens_clean[current_token_index].value)
-            # self.sintax_errors = True
         # --------------------------------------------------
 
         token_index = 0
@@ -782,3 +779,5 @@ class CompilerDef():
     def has_sintax_errors(self):
         if self.sintax_errors:
             Log.FAIL('\nSintax errors found on compiler definition file')
+            Log.WARNING('\nPlease fix errors before continuing')
+            # exit()
