@@ -421,6 +421,7 @@ class CompilerDef():
 
     def get_tokens(self):
         # Gramatica Regular
+        # Se extraen los tokens por linea
         line_index = 0
         while line_index < len(self.file_lines):
             line = self.file_lines[line_index].replace('\n', '\\n')
@@ -435,6 +436,7 @@ class CompilerDef():
                 Log.INFO(token)
 
     def eval_line(self, line, line_index):
+        # Se extraen los tokens por linea
         analyzed_lines = 1
         line_position = 0
         current_line_recognized_tokens = []
@@ -443,37 +445,49 @@ class CompilerDef():
             next_token = None
             avance = 0
             continuar = True
-            while continuar:
+
+            while continuar: # Ciclo del centinela
+
+                # Se evalua si el siguiente posible token es valido
+                # Si no es valido, se acepta current_token como el ultimo token valido
                 if current_token and next_token:
                     if current_token.type != 'ERROR' and next_token.type == 'ERROR':
-                        avance -= 1
+                        avance -= 1 # Se retrocede una posicion
+                        # Se termina el ciclo
                         continuar = False
                         break
 
+                # Se termina el ciclo si se llega al final de la linea
                 if line_position + avance > len(line):
                     continuar = False
                     break
 
+                # Se evalua el token actual
                 if line_position + avance <= len(line):
                     current_token = Token(line[line_position:line_position + avance], line_index, line_position)
 
                 avance += 1
 
+                # Se evalua el siguiente token si no se llego al final de la linea
                 if line_position + avance <= len(line):
                     next_token = Token(line[line_position:line_position + avance], line_index, line_position)
 
                 # Log.WARNING(current_token)
 
+            # Se actualiza la posicion en la linea
             line_position = line_position + avance
 
 
             if current_token and current_token.type != 'ERROR':
+                # Si el token es valido se guarda en los tokens reconocidos de la linea actual
                 # Log.INFO(current_token)
                 self.tokens.append(current_token)
                 current_line_recognized_tokens.append(current_token)
             else:
                 # Log.FAIL(current_token)
 
+                # Si se llega al final de la linea y no se reonocio ningun token valido en la linea,
+                # se guarda un token de tipo error
                 if line_position == len(line) + 1 and len(current_line_recognized_tokens) != 0:
                     self.tokens.append(current_token)
 
@@ -521,6 +535,7 @@ class CompilerDef():
         self.TOKENS_RE = {}
 
         # Analizar flujo de tokens
+        # --------------------------------------------------
         self.clean_tokens()
 
         current_token_index = self.eval_sintax(PRODUCTIONS['program'])
@@ -530,6 +545,7 @@ class CompilerDef():
         if current_token_index != len(self.tokens_clean):
             Log.FAIL('\n\nSintax error on line ', self.tokens_clean[current_token_index].line, ' column ', self.tokens_clean[current_token_index].column, ': ', self.tokens_clean[current_token_index].value)
             # self.sintax_errors = True
+        # --------------------------------------------------
 
         token_index = 0
         while token_index < len(self.tokens_clean):
@@ -687,6 +703,7 @@ class CompilerDef():
         return current_token_index
 
     def matches(self, sintax_token, current_token):
+        # Se valida si el token actual es un token valido para la sintaxis
         if sintax_token['type'] == 'KEYWORD':
             if sintax_token['type'] == current_token.type:
                 if sintax_token['value'] == current_token.value:
