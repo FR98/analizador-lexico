@@ -14,7 +14,6 @@ class LexGenerator:
         self.FILE_LINES = []
         self.extract_compiler_def()
         self.lex_analyzer_construction()
-        self.write_lex_analyzer()
 
     def add_header(self):
         self.FILE_LINES.append('# -------------------------------------------------------')
@@ -49,6 +48,37 @@ class LexGenerator:
         Log.OKGREEN('\nContent extracted successfully!\n')
 
     def lex_analyzer_construction(self):
+        os.system('cp lex-analyzer.template.py lex-analyzer.py')
+
+        characters_to_replace = ''
+        characters_to_replace += 'CHARACTERS = {\n'
+        for key, value in self.compiler_def.CHARACTERS.items():
+            characters_to_replace += f"    '{key}': '{value}',\n"
+        characters_to_replace += '}'
+
+        keywords_to_replace = ''
+        keywords_to_replace += 'KEYWORDS = {\n'
+        for key, value in self.compiler_def.KEYWORDS.items():
+            keywords_to_replace += f"    '{key}': '{value}',\n"
+        keywords_to_replace += '}'
+
+        tokens_re_to_replace = ''
+        tokens_re_to_replace += 'TOKENS_RE = {\n'
+        for key, value in self.compiler_def.TOKENS_RE.items():
+            tokens_re_to_replace += f"    '{key}': '{value}',\n"
+        tokens_re_to_replace += '}'
+
+        with open('lex-analyzer.py', 'r') as file:
+            data = file.read().replace('{{COMPILER_NAME}}', self.compiler_def.COMPILER_NAME)
+            data = data.replace('{{CHARACTERS}}', characters_to_replace)
+            data = data.replace('{{KEYWORDS}}', keywords_to_replace)
+            data = data.replace('{{TOKENS_RE}}', tokens_re_to_replace)
+
+        with open('lex-analyzer.py', 'w') as file:
+            file.write(data)
+
+
+    def lex_analyzer_construction_old(self):
         # -------------------------------------------------------
         # Construction of the lexical analyzer file
         # -------------------------------------------------------
@@ -266,7 +296,7 @@ class LexGenerator:
 
 
 
-    def write_lex_analyzer(self):
+    def write_lex_analyzer_old(self):
         # -------------------------------------------------------
         # Writing the lexical analyzer file
         # -------------------------------------------------------
