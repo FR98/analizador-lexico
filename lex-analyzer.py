@@ -120,66 +120,73 @@ def eval_line(entry_file_lines, line, line_index):
 
 # -------------------------------------------------------
 
-try:
-    entry_file = open('input/entry.w', 'r')
-except IOError:
-    print('File not found or path is incorrect')
-    exit()
+def run():
+    try:
+        entry_file = open('input/entry.w', 'r')
+    except IOError:
+        print('File not found or path is incorrect')
+        exit()
 
-entry_file_lines = entry_file.readlines()
-entry_file.close()
+    entry_file_lines = entry_file.readlines()
+    entry_file.close()
 
-# -------------------------------------------------------
-# GET TOKENS
-# -------------------------------------------------------
-line_index = 0
-while line_index < len(entry_file_lines):
-    line = entry_file_lines[line_index].replace('\n', '\\n')
-    analyzed_lines = eval_line(entry_file_lines, line, line_index)
-    line_index += analyzed_lines
+    # -------------------------------------------------------
+    # GET TOKENS
+    # -------------------------------------------------------
+    line_index = 0
+    while line_index < len(entry_file_lines):
+        line = entry_file_lines[line_index].replace('\n', '\\n')
+        analyzed_lines = eval_line(entry_file_lines, line, line_index)
+        line_index += analyzed_lines
 
-Log.OKGREEN('\n\nTokens found:')
-for token in TOKENS:
-    if token.type == 'ERROR':
-        Log.WARNING(token)
-    else:
-        Log.INFO(token)
-
-# -------------------------------------------------------
-# GET TOKENS
-# -------------------------------------------------------
-lexical_errors = False
-Log.OKBLUE('\n\nLexical errors:')
-for token in TOKENS:
-    if token.type == 'ERROR':
-        Log.WARNING(f'Lexical error on line {token.line} column {token.column}: {token.value}')
-        lexical_errors = True
-
-if lexical_errors:
-    Log.FAIL('\nLexical errors found on compiler definition file')
-
-# -------------------------------------------------------
-# WRITE TOKEN FLOW FILE
-# -------------------------------------------------------
-try:
-    tokens_flow_file = open('output/tokens-flow', 'w+')
-
+    Log.OKGREEN('\n\nTokens found:')
     for token in TOKENS:
-        if token.type == 'KEYWORD':
-            if token.value == '\\n':
-                tokens_flow_file.write('\n')
-            else:
-               tokens_flow_file.write(f'{token.value}')
-        elif token.type == 'space':
-            tokens_flow_file.write(f'{token.value}')
+        if token.type == 'ERROR':
+            Log.WARNING(token)
         else:
-            tokens_flow_file.write(f'{token.type}')
+            Log.INFO(token)
 
-    Log.OKGREEN('\nTokens flow file generated successfully.')
-except:
-    Log.FAIL('\nThere was an error opening and writing on the file.')
-    exit()
-finally:
-    tokens_flow_file.close()
+    # -------------------------------------------------------
+    # GET TOKENS
+    # -------------------------------------------------------
+    lexical_errors = False
+    Log.OKBLUE('\n\nLexical errors:')
+    for token in TOKENS:
+        if token.type == 'ERROR':
+            Log.WARNING(f'Lexical error on line {token.line} column {token.column}: {token.value}')
+            lexical_errors = True
 
-Log.N('\nTokens flow file finished.')
+    if lexical_errors:
+        Log.FAIL('\nLexical errors found on compiler definition file')
+
+    # -------------------------------------------------------
+    # WRITE TOKEN FLOW FILE
+    # -------------------------------------------------------
+    try:
+        tokens_flow_file = open('output/tokens-flow', 'w+')
+
+        for token in TOKENS:
+            if token.type == 'KEYWORD':
+                if token.value == '\\n':
+                    tokens_flow_file.write('\n')
+                else:
+                    tokens_flow_file.write(f'{token.value}')
+            elif token.type == 'space':
+                tokens_flow_file.write(f'{token.value}')
+            else:
+                tokens_flow_file.write(f'{token.type}')
+
+        Log.OKGREEN('\nTokens flow file generated successfully.')
+    except:
+        Log.FAIL('\nThere was an error opening and writing on the file.')
+        exit()
+    finally:
+        tokens_flow_file.close()
+
+    Log.N('\nTokens flow file finished.')
+
+
+try:
+    run()
+except Exception as e:
+    Log.FAIL('There is an error: ', e)

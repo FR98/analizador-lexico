@@ -279,6 +279,7 @@ def afd_test():
 
 afd_test()
 
+# lexical_generator()
 try:
     lexical_generator()
 except Exception as e:

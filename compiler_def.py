@@ -584,7 +584,10 @@ class CompilerDef():
                         value = ''
                         for token in definition_tokens[2::]:
                             if token.type == 'ident':
-                                value += self.CHARACTERS[token.value]
+                                if token.value == 'CHR':
+                                    value += chr(int(definition_tokens[definition_tokens.index(token) + 2].value))
+                                else:
+                                    value += self.CHARACTERS[token.value]
                             elif token.type == 'string':
                                 value += token.value.replace('"', '')
 
