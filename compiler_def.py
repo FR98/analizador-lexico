@@ -626,11 +626,11 @@ class CompilerDef():
                         for token in definition_tokens[2::]:
                             if token.type == 'ident':
                                 if token.value not in ['EXCEPT', 'KEYWORDS']:
-                                    value.append(token.value)
+                                    value.append(token)
                             elif token.type == 'string':
-                                value.append(token.value.replace('"', ''))
+                                value.append(token)
                             elif token.type in ['iteration', 'option', 'group', 'or']:
-                                value.append(token.value)
+                                value.append(token)
 
                         self.TOKENS_RE[definition_tokens[0].value] = value
             token_index += 1
@@ -640,19 +640,6 @@ class CompilerDef():
 
         self.TOKENS_RE = self.parse_TOKENS_RE(self.TOKENS_RE)
         self.TOKENS_RE['space'] = ' '
-
-        print('\n\nORIGINAL')
-        print('TOKENS_RE: \n', self.TOKENS_RE)
-
-        self.TOKENS_RE = {
-            'id': 'A«A¦B»±',
-            'number': 'B«B»±',
-            'hexnumber': 'C«C»±',
-            'space': ' ',
-        }
-
-        print('\n\nPARSED')
-        print('TOKENS_RE: \n', self.TOKENS_RE)
 
     def eval_sintax(self, productions, current_token_index = 0):
         current_sintax_index = 0
@@ -736,10 +723,15 @@ class CompilerDef():
         for key, val in TOKENS_RE.items():
             value = ''
             for token in val:
-                if token in self.symbols:
-                    value += self.symbols[token]
+                if token.value in self.symbols:
+                    value += self.symbols[token.value]
                 else:
-                    value += token
+                    if token.type in ['iteration', 'option', 'group', 'or']:
+                        value += token.value
+                    else:
+                        # TODO: Add support for strings
+                        # value += token.value
+                        print(token)
 
             TOKENS_RE[key] = self.changeExp(value)
 
@@ -760,6 +752,7 @@ class CompilerDef():
 
         re = re.replace('{', '«')
         re = re.replace('}', '»')
+        re = re.replace('|', '¦')
 
         for i in range(len(closeK)):
             re = re[:closeK[i]+1+i] + '±' + re[closeK[i]+1+i:]
