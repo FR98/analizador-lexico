@@ -4,7 +4,7 @@
 # Francisco Rosal - 18676
 # -------------------------------------------------------
 
-# Lexical Analyzer for Ejemplo Compiler
+# Lexical Analyzer for {{COMPILER_NAME}} Compiler
 
 from afd import AFD
 from log import Log
@@ -12,27 +12,13 @@ from log import Log
 ANY_BUT_QUOTES = '«««««««««««««««l¦d»¦s»¦o»¦ »¦(»¦)»¦/»¦*»¦=»¦.»¦|»¦[»¦]»¦{»¦}»'
 
 # CHARACTERS
-CHARACTERS = {
-    'A': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    'B': '0123456789',
-    'C': '0123456789ABCDEF',
-    ' ': ' ',
-}
+{{CHARACTERS}}
 
 # KEYWORDS
-KEYWORDS = {
-    'NEWLINE': '\\n',
-    'if': 'if',
-    'while': 'while',
-}
+{{KEYWORDS}}
 
 # TOKENS RE
-TOKENS_RE = {
-    'id': 'A«A¦B»±',
-    'number': 'B«B»±',
-    'hexnumber': 'C«C»±',
-    'space': ' ',
-}
+{{TOKENS_RE}}
 
 
 # PRODUCTIONS
