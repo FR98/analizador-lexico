@@ -694,7 +694,6 @@ class CompilerDef():
                 else:
                     if not optional or ocurrences:
                         valid_production = False
-                current_sintax_index += 1
 
             else:
                 if self.current_token_index < len(self.tokens_clean):
@@ -708,16 +707,15 @@ class CompilerDef():
                     else:
                         if not optional or ocurrences:
                             valid_production = False
-                    current_sintax_index += 1
 
             if ocurrences:
-                current_sintax_index -= 1
                 while True:
                     valid_repited_sub_production = self.has_valid_sintax(PRODUCTIONS[sintax_token['value']])
 
                     if not valid_repited_sub_production:
                         break
-                current_sintax_index += 1
+
+            current_sintax_index += 1
 
         return valid_production
 
