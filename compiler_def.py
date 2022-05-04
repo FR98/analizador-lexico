@@ -236,7 +236,11 @@ PRODUCTIONS = {
             'optional': True,
         }, {
             'type': 'string',
-            'match': 'EXCEPT KEYWORDS',
+            'match': 'EXCEPT',
+            'optional': True,
+        }, {
+            'type': 'string',
+            'match': 'KEYWORDS',
             'optional': True,
         }, {
             'type': 'final',
@@ -404,6 +408,7 @@ class CompilerDef():
         self.TOKENS_RE = {}
         self.PRODUCTIONS = {}
         self.symbols = {}
+        self.current_token_index = 0
 
         self.get_tokens()
         self.has_lexical_errors()
@@ -510,26 +515,20 @@ class CompilerDef():
             exit()
 
     def clean_tokens(self):
-        for token in self.tokens:
+        # for token in self.tokens:
+        token_index = 0
+        while token_index < len(self.tokens):
+            token = self.tokens[token_index]
+            token_index += 1
             if token.type == 'space' or token.type == 'comment' or token.type == 'comment_block':
                 continue
             elif token.type == 'KEYWORD' and token.value == '\\n':
                 continue
+            if token.value == 'EXCEPT':
+                token_index += 2
+                continue
             else:
                 self.tokens_clean.append(token)
-
-    def check_sintax(self):
-        # Analizar flujo de tokens
-        self.clean_tokens()
-
-        current_token_index = self.eval_sintax(PRODUCTIONS['program'])
-
-        Log.INFO('\n\nSintax analysis: finished')
-
-        if current_token_index != len(self.tokens_clean):
-            Log.FAIL('\n\nSintax error on line ', self.tokens_clean[current_token_index].line, ' column ', self.tokens_clean[current_token_index].column, ': ', self.tokens_clean[current_token_index].value)
-            self.sintax_errors = True
-
 
     def get_definitions(self):
         # Gramaticas libres de contexto - Analisis Sintactico
@@ -657,7 +656,22 @@ class CompilerDef():
         self.TOKENS_RE = self.parse_TOKENS_RE(self.TOKENS_RE)
         self.TOKENS_RE['space'] = ' '
 
-    def eval_sintax(self, productions, current_token_index = 0):
+    def check_sintax(self):
+        # Analizar flujo de tokens
+        self.clean_tokens()
+
+        has_valid_sintax = self.has_valid_sintax(PRODUCTIONS['program'])
+
+        if not has_valid_sintax:
+            self.sintax_errors = True
+
+        if self.current_token_index < len(self.tokens_clean):
+            # if self.tokens_clean[self.current_token_index] != self.tokens_clean[-1]:
+            #     self.sintax_errors = True
+            Log.FAIL('\n\nSintax error on line ', self.tokens_clean[self.current_token_index].line, ' column ', self.tokens_clean[self.current_token_index].column, ': ', self.tokens_clean[self.current_token_index].value)
+
+    def has_valid_sintax(self, productions):
+        valid_production = False
         current_sintax_index = 0
         while current_sintax_index < len(productions):
             sintax_token = productions[current_sintax_index]
@@ -673,52 +687,55 @@ class CompilerDef():
                 optional = True
 
             if sintax_token['type'] == 'PRODUCTION':
-                current_token_index = self.eval_sintax(PRODUCTIONS[sintax_token['value']], current_token_index)
+                valid_sub_production = self.has_valid_sintax(PRODUCTIONS[sintax_token['value']])
 
-                if not ocurrences:
-                    current_sintax_index += 1
+                if valid_sub_production:
+                    valid_production = True
                 else:
-                    temp_current_token_index = self.eval_sintax(PRODUCTIONS[sintax_token['value']], current_token_index)
-
-                    if temp_current_token_index == current_token_index + len(PRODUCTIONS[sintax_token['value']]):
-                        current_token_index = temp_current_token_index
-                        current_sintax_index += 0
-                    else:
-                        current_sintax_index += 1
+                    if not optional or ocurrences:
+                        valid_production = False
 
             else:
-                if current_token_index < len(self.tokens_clean):
-                    current_token = self.tokens_clean[current_token_index]
+                if self.current_token_index < len(self.tokens_clean):
+                    current_token = self.tokens_clean[self.current_token_index]
 
-                    print("C", sintax_token['type'], current_token.type, current_token.value)
                     matches = self.matches(sintax_token, current_token)
 
                     if matches:
-                        current_token_index += 1
-                        current_sintax_index += 1
+                        self.current_token_index += 1
+                        valid_production = True
                     else:
-                        # if optional:
-                        current_sintax_index += 1
+                        if not optional or ocurrences:
+                            valid_production = False
 
-        return current_token_index
+            if ocurrences:
+                while True:
+                    valid_repited_sub_production = self.has_valid_sintax(PRODUCTIONS[sintax_token['value']])
+
+                    if not valid_repited_sub_production:
+                        break
+
+            current_sintax_index += 1
+
+        return valid_production
 
     def matches(self, sintax_token, current_token):
         # Se valida si el token actual es un token valido para la sintaxis
         if sintax_token['type'] == 'KEYWORD':
             if sintax_token['type'] == current_token.type:
                 if sintax_token['value'] == current_token.value:
-                    Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
+                    # Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
                     return True
         elif sintax_token['type'] == 'OPTIONS':
             for option in sintax_token['options']:
-                return self.matches(option, current_token)
+                if self.matches(option, current_token):
+                    return True
+            return False
         elif sintax_token['type'] == 'PRODUCTION':
             return self.matches(PRODUCTIONS[sintax_token['value']][0], current_token)
         else:
-            print(sintax_token)
-            print("---------------------------------------", sintax_token['type'], current_token.type)
             if sintax_token['type'] == current_token.type:
-                Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
+                # Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
                 return True
 
         return False
@@ -780,4 +797,4 @@ class CompilerDef():
         if self.sintax_errors:
             Log.FAIL('\nSintax errors found on compiler definition file')
             Log.WARNING('\nPlease fix errors before continuing')
-            # exit()
+            exit()
