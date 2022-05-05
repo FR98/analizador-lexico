@@ -196,7 +196,7 @@ PRODUCTIONS = {
     'CharCalculation': [
         {
             'type': 'ident',
-            'match': "CHR",
+            'match': 'CHR',
         }, {
             'type': 'group',
         }, {

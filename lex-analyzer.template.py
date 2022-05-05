@@ -158,9 +158,11 @@ def run():
                 else:
                     tokens_flow_file.write(f'{token.value}')
             elif token.type == 'space':
-                tokens_flow_file.write(f'{token.value}')
+                # tokens_flow_file.write(f'{token.value}')
+                continue
             else:
                 tokens_flow_file.write(f'{token.type}')
+            tokens_flow_file.write(' ')
 
         Log.OKGREEN('\nTokens flow file generated successfully.')
     except:
