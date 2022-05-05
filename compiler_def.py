@@ -168,6 +168,23 @@ PRODUCTIONS = {
             'ocurrences': '+',
         }
     ],
+    'BasicSet': [
+        {
+            'type': 'OPTIONS',
+            'options': [
+                {
+                    'type': 'PRODUCTION',
+                    'value': 'CharCalculation',
+                }, {
+                    'type': 'char',
+                }, {
+                    'type': 'string',
+                }, {
+                    'type': 'ident',
+                }
+            ]
+        }
+    ],
     'BasicSetConvination': [
         {
             'type': 'operator',
@@ -176,38 +193,10 @@ PRODUCTIONS = {
             'value': 'BasicSet',
         }
     ],
-    'BasicSet': [
-        {
-            'type': 'OPTIONS',
-            'options': [
-                {
-                    'type': 'string',
-                }, {
-                    'type': 'ident',
-                }, {
-                    'type': 'PRODUCTION',
-                    'value': 'Char', # TODO: BasicSet = string | ident | Char [".." Char].
-                }
-            ]
-        }
-    ],
-    'Char': [
-        {
-            'type': 'OPTIONS',
-            'options': [
-                {
-                    'type': 'char',
-                }, {
-                    'type': 'PRODUCTION',
-                    'value': 'CharCalculation',
-                }
-            ]
-        }
-    ],
     'CharCalculation': [
         {
-            'type': 'string',
-            'match': "CHR",
+            'type': 'ident',
+            'match': 'CHR',
         }, {
             'type': 'group',
         }, {
@@ -413,8 +402,9 @@ class CompilerDef():
         self.get_tokens()
         self.has_lexical_errors()
 
-        self.check_sintax()
-        self.has_sintax_errors()
+        self.clean_tokens()
+        # self.check_sintax()
+        # self.has_sintax_errors()
 
         self.get_definitions()
         self.has_sintax_errors()
@@ -428,12 +418,12 @@ class CompilerDef():
             analyzed_lines = self.eval_line(line, line_index)
             line_index += analyzed_lines
 
-        Log.OKGREEN('\n\nTokens found:')
-        for token in self.tokens:
-            if token.type == 'ERROR':
-                Log.WARNING(token)
-            else:
-                Log.INFO(token)
+        # Log.OKGREEN('\n\nTokens found:')
+        # for token in self.tokens:
+        #     if token.type == 'ERROR':
+        #         Log.WARNING(token)
+        #     else:
+        #         Log.INFO(token)
 
     def eval_line(self, line, line_index):
         # Se extraen los tokens por linea
@@ -658,8 +648,6 @@ class CompilerDef():
 
     def check_sintax(self):
         # Analizar flujo de tokens
-        self.clean_tokens()
-
         has_valid_sintax = self.has_valid_sintax(PRODUCTIONS['program'])
 
         if not has_valid_sintax:
@@ -689,11 +677,11 @@ class CompilerDef():
             if sintax_token['type'] == 'PRODUCTION':
                 valid_sub_production = self.has_valid_sintax(PRODUCTIONS[sintax_token['value']])
 
-                if valid_sub_production:
-                    valid_production = True
-                else:
-                    if not optional or ocurrences:
-                        valid_production = False
+                valid_production = valid_sub_production
+
+                if not valid_sub_production:
+                    if optional and not ocurrences:
+                        valid_production = True
 
             else:
                 if self.current_token_index < len(self.tokens_clean):
@@ -701,12 +689,15 @@ class CompilerDef():
 
                     matches = self.matches(sintax_token, current_token)
 
+                    Log.INFO(matches, current_token, sintax_token)
+
+                    valid_production = matches
+
                     if matches:
                         self.current_token_index += 1
-                        valid_production = True
                     else:
-                        if not optional or ocurrences:
-                            valid_production = False
+                        if optional and not ocurrences:
+                            valid_production = True
 
             if ocurrences:
                 while True:
@@ -724,18 +715,26 @@ class CompilerDef():
         if sintax_token['type'] == 'KEYWORD':
             if sintax_token['type'] == current_token.type:
                 if sintax_token['value'] == current_token.value:
-                    # Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
+                    # Log.OKGREEN(f'\t{current_token.type} {current_token.value} {sintax_token}')
                     return True
         elif sintax_token['type'] == 'OPTIONS':
             for option in sintax_token['options']:
                 if self.matches(option, current_token):
+                    # Log.OKGREEN(f'\t{current_token.type} {current_token.value} {option}')
                     return True
             return False
         elif sintax_token['type'] == 'PRODUCTION':
             return self.matches(PRODUCTIONS[sintax_token['value']][0], current_token)
         else:
             if sintax_token['type'] == current_token.type:
-                # Log.OKGREEN(f'\t{current_token.type} {current_token.value}')
+                if sintax_token.get('match'):
+                    if  sintax_token.get('match') == current_token.value:
+                        # Log.OKGREEN(f'\t{current_token.type} {current_token.value} {sintax_token}')
+                        return True
+                    else:
+                        return False
+
+                # Log.OKGREEN(f'\t{current_token.type} {current_token.value} {sintax_token}')
                 return True
 
         return False
