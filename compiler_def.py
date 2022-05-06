@@ -740,18 +740,22 @@ class CompilerDef():
         return False
 
     def parse_CHARACTERS(self, CHARACTERS):
-        cont = 65
+        # options = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        options = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
+        cont = 0
         keys = list(CHARACTERS.keys())
         for i in range(len(CHARACTERS)):
-            # self.symbols[chr(cont)] = keys[i]
-            self.symbols[keys[i]] = chr(cont)
-            CHARACTERS[chr(cont)] = CHARACTERS.pop(keys[i])
+            # self.symbols[options[cont]] = keys[i]
+            self.symbols[keys[i]] = options[cont]
+            CHARACTERS[options[cont]] = CHARACTERS.pop(keys[i])
             cont += 1
 
         return CHARACTERS
 
     def parse_TOKENS_RE(self, TOKENS_RE):
         # 'letter {letter|digit} EXCEPT KEYWORDS' ---> 'A«A¦B»±'
+        # options = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+        options = ['S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
         for key, val in TOKENS_RE.items():
             value = ''
@@ -763,6 +767,12 @@ class CompilerDef():
                         value += token.value
                     else:
                         # TODO: Add support for strings
+                        for o in options:
+                            if o not in list(self.symbols.values()):
+                                self.symbols[token.value] = o
+                                value += o
+                                self.CHARACTERS[o] = token.value.replace('"', '')
+                                break
                         # value += token.value
                         print(token)
 
