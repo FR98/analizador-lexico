@@ -428,44 +428,38 @@ class CompilerDef():
     def eval_line(self, line, line_index):
         # Se extraen los tokens por linea
         analyzed_lines = 1
-        line_position = 0
+        line_position_init = 0
         current_line_recognized_tokens = []
-        while line_position < len(line):
+        while line_position_init < len(line):
             current_token = None
-            next_token = None
-            avance = 0
+            avance = len(line)
             continuar = True
 
             while continuar: # Ciclo del centinela
 
-                # Se evalua si el siguiente posible token es valido
-                # Si no es valido, se acepta current_token como el ultimo token valido
-                if current_token and next_token:
-                    if current_token.type != 'ERROR' and next_token.type == 'ERROR':
-                        avance -= 1 # Se retrocede una posicion
+                # Se evalua si el token mas grande evaluado es valido
+                # Si no es valido, se acepta current_token como el token mas grande valido
+                if current_token:
+                    if current_token.type != 'ERROR':
+                        avance += 1 # Se avanza una posicion
                         # Se termina el ciclo
                         continuar = False
                         break
 
                 # Se termina el ciclo si se llega al final de la linea
-                if line_position + avance > len(line):
+                if line_position_init == len(line):
                     continuar = False
                     break
 
-                # Se evalua el token actual
-                if line_position + avance <= len(line):
-                    current_token = Token(line[line_position:line_position + avance], line_index, line_position)
+                # Se evalua el token mas grande actual
+                current_token = Token(line[line_position_init:avance], line_index, line_position_init)
 
-                avance += 1
-
-                # Se evalua el siguiente token si no se llego al final de la linea
-                if line_position + avance <= len(line):
-                    next_token = Token(line[line_position:line_position + avance], line_index, line_position)
+                avance -= 1 # Se retrocede una posicion
 
                 # Log.WARNING(current_token)
 
             # Se actualiza la posicion en la linea
-            line_position = line_position + avance
+            line_position_init = avance
 
 
             if current_token and current_token.type != 'ERROR':
@@ -478,12 +472,12 @@ class CompilerDef():
 
                 # Si se llega al final de la linea y no se reonocio ningun token valido en la linea,
                 # se guarda un token de tipo error
-                if line_position == len(line) + 1 and len(current_line_recognized_tokens) != 0:
+                if line_position_init == len(line) + 1 and len(current_line_recognized_tokens) != 0:
                     self.tokens.append(current_token)
 
                 # Si se llega al final de la linea y no se reconoce ningun token,
                 # se agrega la siguiente linea y se vuelve a intentar.
-                if line_position == len(line) + 1 and len(current_line_recognized_tokens) == 0:
+                if line_position_init == len(line) + 1 and len(current_line_recognized_tokens) == 0:
                     if line_index < len(self.file_lines) - 1:
                         new_line = line.replace('\\n', ' ') + ' ' + self.file_lines[line_index + 1].replace('\n', '\\n')
                         line_index += 1
@@ -519,6 +513,9 @@ class CompilerDef():
                 continue
             else:
                 self.tokens_clean.append(token)
+
+        # for token in self.tokens_clean:
+        #     Log.INFO(token)
 
     def get_definitions(self):
         # Gramaticas libres de contexto - Analisis Sintactico
