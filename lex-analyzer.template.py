@@ -75,7 +75,7 @@ def eval_line(entry_file_lines, line, line_index):
 
             avance -= 1
 
-            # Log.WARNING(current_token)
+            Log.WARNING(current_token)
 
         line_position_init = avance
 

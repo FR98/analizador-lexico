@@ -403,8 +403,8 @@ class CompilerDef():
         self.has_lexical_errors()
 
         self.clean_tokens()
-        # self.check_sintax()
-        # self.has_sintax_errors()
+        self.check_sintax()
+        self.has_sintax_errors()
 
         self.get_definitions()
         self.has_sintax_errors()
@@ -695,6 +695,8 @@ class CompilerDef():
 
                     if matches:
                         self.current_token_index += 1
+                        if current_token.value == 'CHR': # TODO: Revisar
+                            self.current_token_index += 3
                     else:
                         if optional and not ocurrences:
                             valid_production = True
