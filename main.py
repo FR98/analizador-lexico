@@ -283,4 +283,4 @@ afd_test()
 try:
     lexical_generator()
 except Exception as e:
-    Log.FAIL('\nUnable to generate lexical analyzer', e)
+    Log.FAIL('\nUnable to generate lexical analyzer. Error: ', e)
