@@ -122,22 +122,14 @@ def run():
         analyzed_lines = eval_line(entry_file_lines, line, line_index)
         line_index += analyzed_lines
 
-    Log.OKGREEN('\n\nTokens found:')
-    for token in TOKENS:
-        if token.type == 'ERROR':
-            Log.WARNING(token)
-        else:
-            Log.INFO(token)
-
-    # -------------------------------------------------------
-    # GET TOKENS
-    # -------------------------------------------------------
     lexical_errors = False
-    Log.OKBLUE('\n\nLexical errors:')
+    Log.OKGREEN('\n\nTokens found:')
     for token in TOKENS:
         if token.type == 'ERROR':
             Log.WARNING(f'Lexical error on line {token.line} column {token.column}: {token.value}')
             lexical_errors = True
+        else:
+            Log.INFO(token)
 
     if lexical_errors:
         Log.FAIL('\nLexical errors found on compiler definition file')
