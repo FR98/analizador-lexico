@@ -456,7 +456,10 @@ class CompilerDef():
 
                 avance -= 1 # Se retrocede una posicion
 
-                # Log.WARNING(current_token)
+                # if current_token.type == 'ERROR':
+                #     Log.WARNING(current_token)
+                # else:
+                #     Log.INFO(current_token)
 
             # Se actualiza la posicion en la linea
             line_position_init = avance
@@ -514,8 +517,8 @@ class CompilerDef():
             else:
                 self.tokens_clean.append(token)
 
-        # for token in self.tokens_clean:
-        #     Log.INFO(token)
+        for token in self.tokens_clean:
+            Log.INFO(token)
 
     def get_definitions(self):
         # Gramaticas libres de contexto - Analisis Sintactico
